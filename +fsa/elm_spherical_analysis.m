@@ -39,7 +39,7 @@ for image_num = 1:length(input_files)
 
 	% Fit all segmented shells and display to the user one by one, if flag set
 	fits = cell(length(shell_segments) + 1, 1);
-	fits{1} = ['x segment pos', 'y segment pos', 'x shift', 'y shift', 'orientation', 'semiminor axis', 'PSF variance', 'brightness', 'aspect ratio', 'equatoriality'];
+	fits{1} = {'x segment pos', 'y segment pos', 'x shift', 'y shift', 'radius', 'PSF sigma', 'brightness'};
 	parfor i=1:length(shell_segments)
 		actual_image = shell_segments{i};
 		background = median(actual_image(actual_image < mean(actual_image(:))));
@@ -98,6 +98,8 @@ for image_num = 1:length(input_files)
 
 	% Save fit parameters
 	save(fullfile(output_dir, [image_basename, '_params.mat']), 'fits')
+	fits{1} = [];
+	csvwrite(fullfile(output_dir, [image_basename, '_params.csv']), fits)
 	
 	% Update waitbar
 	waitbar(image_num / length(input_files));
