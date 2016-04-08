@@ -25,14 +25,14 @@ for image_num = 1:length(input_files)
 	% Find and display shells
 	figure(1)
 	[centres, radii, metric] = fsa.find_circular_shells(image_data, radius_lower, radius_upper, segment_half_size, edge_border, true);
-	title(image_basename)
+	title(image_basename, 'interpreter', 'none')
 
 	% Tile segmented shells in figure
 	shell_segments = fsa.segment_shells(image_data, centres, segment_half_size);
 	tiled_segments = fsa.tile_segments(shell_segments);
 	figure(2)
 	imshow(tiled_segments, [])
-	title(['Segmented shells for ', image_basename])
+	title(['Segmented shells for ', image_basename], 'interpreter', 'none')
 
 	% Save segmented shell tiles
 	imwrite(mat2gray(tiled_segments), fullfile(output_dir, [image_basename, '_raw.tif']));
@@ -79,7 +79,7 @@ for image_num = 1:length(input_files)
 	fit_tiles = fsa.tile_segments(fit_segments);
 	figure(3)
 	imshow(fit_tiles, [])
-	title(['Fitted shells for ', image_basename])
+	title(['Fitted shells for ', image_basename], 'interpreter', 'none')
 
 	% Save fitted shell tiles
 	imwrite(mat2gray(fit_tiles), fullfile(output_dir, [image_basename, '_fits.tif']));
@@ -94,7 +94,7 @@ for image_num = 1:length(input_files)
 	sr_tiles = fsa.tile_segments(sr_segments);
 	figure(4)
 	imshow(sr_tiles, [])
-	title(['SR shells for ', image_basename])
+	title(['SR shells for ', image_basename], 'interpreter', 'none')
 
 	% Save fitted shell tiles
 	imwrite(mat2gray(sr_tiles), fullfile(output_dir, [image_basename, '_sr.tif']));
