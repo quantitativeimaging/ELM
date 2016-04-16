@@ -27,4 +27,6 @@ The second frame shows the model fit for each spore, with the final frame demons
 
 ![](ELM_demo.gif)
 
-In addition to these images, all parameters for the model fit for each spore, along with the residual sum of squares error, is saved to a MATLAB array for quantitative analysis.
+In addition to these images, all parameters for the model fit for each spore, along with the residual sum of squares error, is saved to a MATLAB array for quantitative analysis (see example below).
+
+![](quantitation.png)
