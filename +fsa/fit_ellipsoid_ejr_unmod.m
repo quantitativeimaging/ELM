@@ -1,4 +1,4 @@
-function [x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality] = fit_ellipsoid_ejr_unmod(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, actual_image, ~)
+function [x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, residual] = fit_ellipsoid_ejr_unmod(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, actual_image, ~)
 
 maxVar        = 9; % Prevent PSF width getting stuck at high values.
 flagFixedBlur = 0;  % Or set to 1 to disallow PSF width from varying.
@@ -235,8 +235,12 @@ for lpIts = (numberIts+1): (2*numberIts)
 	ssHtL = sum((IhtLo - listI).^2);
 	if(ssHtH < sumSq && ssHtH < ssHtL)
 			b0(5) = b0(5) + radHt/2;
+			residual = ssHtH;
 	elseif(ssHtL < sumSq && ssHtL < ssHtH)
 			 b0(5) = b0(5) - radHt/2;
+			 residual = ssHtL;
+	else
+		residual = sumSq;
 	end
 	radHt = radHt*shift;
 

@@ -39,7 +39,7 @@ for image_num = 1:length(input_files)
 
 	% Fit all segmented shells and display to the user one by one, if flag set
 	fits = cell(length(shell_segments) + 1, 1);
-	fits{1} = {'x segment pos', 'y segment pos', 'x shift', 'y shift', 'orientation', 'semiminor axis', 'PSF variance', 'brightness', 'aspect ratio', 'equatoriality'};
+	fits{1} = {'x segment pos', 'y segment pos', 'x shift', 'y shift', 'orientation', 'semiminor axis', 'PSF variance', 'brightness', 'aspect ratio', 'equatoriality', 'residual'};
 	parfor i=1:length(shell_segments)
 		actual_image = shell_segments{i};
 		background = median(actual_image(actual_image < mean(actual_image(:))));
@@ -62,11 +62,11 @@ for image_num = 1:length(input_files)
 		equatoriality = 0;
 
 		% Fit shell to spore segment
-		[x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality] = fsa.fit_ellipsoid(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, actual_image);
+		[x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, residual] = fsa.fit_ellipsoid(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, actual_image);
 
 		x_pos = centres(i, 1);
 		y_pos = centres(i, 2);
-		fits{i+1} = [x_pos, y_pos, x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality];
+		fits{i+1} = [x_pos, y_pos, x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, residual];
 	end
 
 	% Fitted segments
@@ -103,7 +103,7 @@ for image_num = 1:length(input_files)
 	save(fullfile(output_dir, [image_basename, '_params.mat']), 'fits')
 	fits{1} = [];
 	csvwrite(fullfile(output_dir, [image_basename, '_params.csv']), fits)
-	
+
 	% Update waitbar
 	waitbar(image_num / length(input_files));
 end

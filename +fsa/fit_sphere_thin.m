@@ -1,4 +1,4 @@
-function [x_centre, y_centre, radius, psf_sigma, height] = fit_sphere_thin(x_centre, y_centre, radius, psf_sigma, height, actual_image)
+function [x_centre, y_centre, radius, psf_sigma, height, residual] = fit_sphere_thin(x_centre, y_centre, radius, psf_sigma, height, actual_image)
 
 image_width = size(actual_image, 2);
 image_height = size(actual_image, 1);
@@ -25,5 +25,7 @@ y_centre  = fit_params(2);
 radius    = fit_params(3);
 psf_sigma = fit_params(4);
 height    = fit_params(5);
+fit_image = fsa.image_sphere_thin(x_centre, y_centre, radius, psf_sigma, height, actual_image);
+residual  = sum((actual_image(:) - fit_image(:)).^2);
 
 end

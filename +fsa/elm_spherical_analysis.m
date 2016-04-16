@@ -39,7 +39,7 @@ for image_num = 1:length(input_files)
 
 	% Fit all segmented shells and display to the user one by one, if flag set
 	fits = cell(length(shell_segments) + 1, 1);
-	fits{1} = {'x segment pos', 'y segment pos', 'x shift', 'y shift', 'radius', 'PSF sigma', 'brightness'};
+	fits{1} = {'x segment pos', 'y segment pos', 'x shift', 'y shift', 'radius', 'PSF sigma', 'brightness', 'residual'};
 	parfor i=1:length(shell_segments)
 		actual_image = shell_segments{i};
 		background = median(actual_image(actual_image < mean(actual_image(:))));
@@ -59,11 +59,11 @@ for image_num = 1:length(input_files)
 		height = max(actual_image(:));
 
 		% Fit shell to spore segment
-		[x_centre_fit, y_centre_fit, radius_fit, psf_sigma_fit, height_fit] = fsa.fit_sphere_thin(x_shift, y_shift, radius, psf_sigma, height, actual_image);
+		[x_centre_fit, y_centre_fit, radius_fit, psf_sigma_fit, height_fit, residual] = fsa.fit_sphere_thin(x_shift, y_shift, radius, psf_sigma, height, actual_image);
 
 		x_pos = centres(i, 1);
 		y_pos = centres(i, 2);
-		fits{i+1} = [x_pos, y_pos, x_centre_fit, y_centre_fit, radius_fit, psf_sigma_fit, height_fit];
+		fits{i+1} = [x_pos, y_pos, x_centre_fit, y_centre_fit, radius_fit, psf_sigma_fit, height_fit, residual];
 	end
 
 	% Fitted segments
@@ -100,7 +100,7 @@ for image_num = 1:length(input_files)
 	save(fullfile(output_dir, [image_basename, '_params.mat']), 'fits')
 	fits{1} = [];
 	csvwrite(fullfile(output_dir, [image_basename, '_params.csv']), fits)
-	
+
 	% Update waitbar
 	waitbar(image_num / length(input_files));
 end
