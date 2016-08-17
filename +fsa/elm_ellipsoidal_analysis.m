@@ -26,6 +26,10 @@ for image_num = 1:length(input_files)
 	figure(1)
 	[centres, radii, metric] = fsa.find_circular_shells(image_data, radius_lower, radius_upper, segment_half_size, edge_border, true);
 	title(image_basename, 'interpreter', 'none')
+    
+    if(length(centres) < 1)
+        continue
+    end
 
 	% Tile segmented shells in figure
 	shell_segments = fsa.segment_shells(image_data, centres, segment_half_size);

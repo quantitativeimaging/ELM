@@ -5,19 +5,22 @@ function [centres, radii, metric] = find_circular_shells(image_data, radius_lowe
 
 % Remove candidates near edge
 A = [centres, radii, metric];
-A(A(:, 1) < segment_half_size + edge_border + 1, :) = [];
-A(A(:, 1) > size(image_data, 2) - (segment_half_size + edge_border) - 1, :) = [];
-A(A(:, 2) < segment_half_size + edge_border + 1, :) = [];
-A(A(:, 2) > size(image_data, 1) - (segment_half_size + edge_border) - 1, :) = [];
-
+if(size(A, 2) > 1)
+    A(A(:, 1) < segment_half_size + edge_border + 1, :) = [];
+    A(A(:, 1) > size(image_data, 2) - (segment_half_size + edge_border) - 1, :) = [];
+    A(A(:, 2) < segment_half_size + edge_border + 1, :) = [];
+    A(A(:, 2) > size(image_data, 1) - (segment_half_size + edge_border) - 1, :) = [];
+end
 
 % Anti-collision filtering
-centres = A(:, 1:2);
-[index, distance] = rangesearch(centres, centres, 2 * segment_half_size);
+if(size(A, 2) > 1)
+    centres = A(:, 1:2);
+    [index3, distance] = rangesearch(centres, centres, 2 * segment_half_size);
 
-[dummy, Index] = sort(cellfun('size', index, 2), 'descend');
-old_index = index;
-index = index(Index);
+[dummy, index2] = sort(cellfun('size', index3, 2), 'descend');
+old_index = index3;
+index3 = index3(index2);
+%end
 
 % indices_remove = [];
 % for (i=1:length(index))
@@ -33,6 +36,8 @@ index = index(Index);
 centres = A(:, 1:2);
 radii   = A(:, 3);
 metric  = A(:, 4);
+
+end
 
 if (ShowPlot)
 	imshow(image_data, []);
