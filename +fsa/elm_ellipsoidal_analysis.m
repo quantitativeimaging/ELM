@@ -63,7 +63,7 @@ for image_num = 1:length(input_files)
 		psf_variance = 6;
 		height = max(actual_image(:));
 		eccentricity = 0.2;
-		equatoriality = 0;
+		equatoriality = -0.2;
 
 		% Fit shell to spore segment
 		[x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, residual] = fsa.fit_ellipsoid(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, actual_image);
