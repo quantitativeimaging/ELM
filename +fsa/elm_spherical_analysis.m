@@ -1,10 +1,12 @@
-function elm_spherical_analysis(input_dir, output_dir, pixel_size)
+function elm_spherical_analysis(input_dir, output_dir, pixel_size, hough_low, hough_high, segmentation, border, seed, fluorophores)
 
 % Parameters for shell finding
-radius_lower = 5;
-radius_upper = 15;
-segment_half_size = 20;
-edge_border = 0;
+radius_lower = hough_low;
+radius_upper = hough_high;
+segment_half_size = segmentation;
+edge_border = border;
+
+rng(seed);
 
 % Set the following flag to 1 to see each segment as it is fitted
 SHOW_ALL_FITS = 0;

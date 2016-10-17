@@ -1,7 +1,5 @@
 function I = cross_section_ellipsoid_biased(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, X, varargin)
 
-rng(1066)
-
 if nargin > 9
 	num_points = varargin{1};
 else

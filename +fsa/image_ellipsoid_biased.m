@@ -1,7 +1,5 @@
 function I = image_ellipsoid_biased(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, imagemat, varargin)
 
-rng(42)
-
 image_width = size(imagemat, 2);
 image_height = size(imagemat, 1);
 

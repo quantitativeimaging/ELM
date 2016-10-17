@@ -22,7 +22,7 @@ function varargout = ELM(varargin)
 
 % Edit the above text to modify the response to help ELM
 
-% Last Modified by GUIDE v2.5 06-Apr-2016 16:12:45
+% Last Modified by GUIDE v2.5 11-Oct-2016 10:22:59
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -60,6 +60,12 @@ guidata(hObject, handles);
 
 % UIWAIT makes ELM wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
+setappdata(0, 'radius_low', 0.95);
+setappdata(0, 'radius_high', 0.99);
+setappdata(0, 'segmentation', 13);
+setappdata(0, 'border', 7);
+setappdata(0, 'seed', 7);
+setappdata(0, 'fluorophores', 3000);
 
 
 % --- Outputs from this function are returned to the command line.
@@ -146,6 +152,14 @@ input_dir = get(handles.input_dir_edit, 'String');
 output_dir = get(handles.output_dir_edit, 'String');
 pixel_size = str2num(get(handles.pixel_size_edit, 'String'));
 model_type = get(get(handles.model_type_group, 'SelectedObject'), 'Tag');
+
+radius_low = str2num(getappdata(0, 'radius_low'));
+radius_high = str2num(getappdata(0, 'radius_high'));
+segmentation = str2num(getappdata(0, 'segmentation'));
+border = str2num(getappdata(0, 'border'));
+seed = str2num(getappdata(0, 'seed'));
+fluorophores = str2num(getappdata(0, 'fluorophores'));
+
 switch model_type
 	case 'spherical_radiobtn'
 		model_type = 'spherical';
@@ -153,7 +167,7 @@ switch model_type
 		model_type = 'ellipsoidal';
 end
 
-fsa.elm_analysis(input_dir, output_dir, pixel_size, model_type)
+fsa.elm_analysis(input_dir, output_dir, pixel_size, model_type, radius_low, radius_high, segmentation, border, seed, fluorophores)
 
 
 % --- Executes on button press in spherical_radiobtn.
@@ -209,3 +223,21 @@ function model_type_group_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to model_type_group (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
+
+
+% --- Executes on button press in advanced_btn.
+function advanced_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to advanced_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+advanced_settings
+
+
+% --- Executes when user attempts to close figure1.
+function figure1_CloseRequestFcn(hObject, eventdata, handles)
+% hObject    handle to figure1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: delete(hObject) closes the figure
+delete(hObject);
