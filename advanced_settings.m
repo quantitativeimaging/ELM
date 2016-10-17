@@ -222,6 +222,7 @@ setappdata(0, 'segmentation', get(handles.segmentation_edit, 'String'));
 setappdata(0, 'border', get(handles.border_edit, 'String'));
 setappdata(0, 'seed', get(handles.seed_edit, 'String'));
 setappdata(0, 'fluorophores', get(handles.fluorophores_edit, 'String'));
+figure1_CloseRequestFcn(handles.figure1, eventdata, handles);
 
 
 % --- Executes on button press in cancel_btn.
