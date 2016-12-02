@@ -99,5 +99,7 @@ To read the data in Matlab, drop the ```.MAT``` files onto the Matlab console, t
 __Notes__
 
 The ```Advanced``` button opens a panel in which some image analysis settings can be adjusted. This may be necessary for images with somewhat different scale or brightness to the sample data.  
+![](doc/ELM_gui_advanced.png)
+
 * The image segmentation step may miss a few spore images. The sensitivity parameter can be adjusted (increased) to capture more candidates, but this might introduce false positive candidates.
 * The image segmentation step uses ```imfindcircles``` which often returns a warning (that the function is looking for small circles). With the sample data, this warning is over-cautious and can be ignored.
