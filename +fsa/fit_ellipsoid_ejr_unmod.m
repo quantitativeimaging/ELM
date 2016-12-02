@@ -1,6 +1,6 @@
 function [x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, residual] = fit_ellipsoid_ejr_unmod(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, actual_image, ~)
 
-maxVar        = 9; % Prevent PSF width getting stuck at high values.
+maxVar        = 16; % Prevent PSF width getting stuck at high values.
 flagFixedBlur = 0;  % Or set to 1 to disallow PSF width from varying.
 
 b0 = [x_shift, y_shift, semiminor_axis, psf_variance, height, eccentricity, orientation, equatoriality];
@@ -168,7 +168,7 @@ for lpIts = 1:numberIts
     if(ssElH < sumSq && ssElH < ssElL)
         b0(6) = b0(6) + radEl*3/4;
     elseif(ssElL < sumSq && ssElL < ssElH)
-         b0(6) = b0(6) - radEl*3/4; % Don't allow -ve ellipticity
+         b0(6) = b0(6) - radEl*3/4; % Consider disallowing -ve ellipticity
     end
     radEl = radEl*shift;
 
@@ -256,18 +256,18 @@ eccentricity = b0(6);
 orientation = b0(7);
 equatoriality = b0(8);
 
-figure(8)
-plot(listParams(:,3), 'b');
-hold on
- plot(listParams(:,4), 'g');
- %plot(listParams(:,5)), 'r';
- plot(listParams(:,1), 'r');
- plot(listParams(:,2), 'k');
- plot(listParams(:,6), 'k--');
- plot(listParams(:,7), 'r--');
- plot(listParams(:,8), 'm');
-hold off
-legend('radius', 'var', 'xCen', 'yCen', 'Ellip', 'Azimuth','Equatoriality')
-xlabel('fit iterations')
+% figure(8)
+% plot(listParams(:,3), 'b');
+% hold on
+%  plot(listParams(:,4), 'g');
+%  %plot(listParams(:,5)), 'r';
+%  plot(listParams(:,1), 'r');
+%  plot(listParams(:,2), 'k');
+%  plot(listParams(:,6), 'k--');
+%  plot(listParams(:,7), 'r--');
+%  plot(listParams(:,8), 'm');
+% hold off
+% legend('radius', 'var', 'xCen', 'yCen', 'Ellip', 'Azimuth','Equatoriality')
+% xlabel('fit iterations')
 
 end

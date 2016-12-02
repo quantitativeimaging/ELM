@@ -60,12 +60,13 @@ guidata(hObject, handles);
 
 % UIWAIT makes ELM wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
-setappdata(0, 'radius_low', 0.95);
-setappdata(0, 'radius_high', 0.99);
-setappdata(0, 'segmentation', 13);
-setappdata(0, 'border', 7);
-setappdata(0, 'seed', 7);
-setappdata(0, 'fluorophores', 3000);
+setappdata(0, 'radius_low', '5');
+setappdata(0, 'radius_high', '15');
+setappdata(0, 'segmentation', '13');
+setappdata(0, 'border', '7');
+setappdata(0, 'seed', '7');
+setappdata(0, 'fluorophores', '3000');
+setappdata(0, 'hough_sensitivity', '0.85');
 
 
 % --- Outputs from this function are returned to the command line.
@@ -159,6 +160,7 @@ segmentation = str2num(getappdata(0, 'segmentation'));
 border = str2num(getappdata(0, 'border'));
 seed = str2num(getappdata(0, 'seed'));
 fluorophores = str2num(getappdata(0, 'fluorophores'));
+hough_sensitivity = str2num(getappdata(0, 'hough_sensitivity'));
 
 switch model_type
 	case 'spherical_radiobtn'
@@ -167,7 +169,7 @@ switch model_type
 		model_type = 'ellipsoidal';
 end
 
-fsa.elm_analysis(input_dir, output_dir, pixel_size, model_type, radius_low, radius_high, segmentation, border, seed, fluorophores)
+fsa.elm_analysis(input_dir, output_dir, pixel_size, model_type, radius_low, radius_high, segmentation, border, seed, fluorophores, hough_sensitivity)
 
 
 % --- Executes on button press in spherical_radiobtn.

@@ -22,7 +22,7 @@ function varargout = advanced_settings(varargin)
 
 % Edit the above text to modify the response to help advanced_settings
 
-% Last Modified by GUIDE v2.5 17-Oct-2016 10:26:52
+% Last Modified by GUIDE v2.5 01-Dec-2016 11:57:20
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -222,6 +222,7 @@ setappdata(0, 'segmentation', get(handles.segmentation_edit, 'String'));
 setappdata(0, 'border', get(handles.border_edit, 'String'));
 setappdata(0, 'seed', get(handles.seed_edit, 'String'));
 setappdata(0, 'fluorophores', get(handles.fluorophores_edit, 'String'));
+setappdata(0, 'hough_sensitivity', get(handles.hough_sensitivity_edit, 'String'));
 figure1_CloseRequestFcn(handles.figure1, eventdata, handles);
 
 
@@ -244,6 +245,8 @@ set(handles.segmentation_edit, 'String', '13');
 set(handles.border_edit, 'String', '7');
 set(handles.seed_edit, 'String', '7');
 set(handles.fluorophores_edit, 'String', '3000');
+set(handles.hough_sensitivity_edit, 'String', '0.85');
+
 
 
 % --- Executes when user attempts to close figure1.
@@ -254,3 +257,26 @@ function figure1_CloseRequestFcn(hObject, eventdata, handles)
 
 % Hint: delete(hObject) closes the figure
 delete(hObject);
+
+
+
+function hough_sensitivity_edit_Callback(hObject, eventdata, handles)
+% hObject    handle to hough_sensitivity_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of hough_sensitivity_edit as text
+%        str2double(get(hObject,'String')) returns contents of hough_sensitivity_edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function hough_sensitivity_edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to hough_sensitivity_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

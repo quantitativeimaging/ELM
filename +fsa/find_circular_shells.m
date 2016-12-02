@@ -1,6 +1,6 @@
-function [centres, radii, metric] = find_circular_shells(image_data, radius_lower, radius_upper, segment_half_size, edge_border, ShowPlot);
+function [centres, radii, metric] = find_circular_shells(image_data, radius_lower, radius_upper, segment_half_size, edge_border, hough_sensitivity, ShowPlot);
 
-[centres, radii, metric] = imfindcircles(image_data, [radius_lower radius_upper]);
+[centres, radii, metric] = imfindcircles(image_data, [radius_lower radius_upper], 'Sensitivity', hough_sensitivity);
 
 
 % Remove candidates near edge

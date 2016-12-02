@@ -1,4 +1,4 @@
-function elm_analysis(input_dir, output_dir, pixel_size, model_type, hough_low, hough_high, segmentation, border, seed, fluorophores)
+function elm_analysis(input_dir, output_dir, pixel_size, model_type, hough_low, hough_high, segmentation, border, seed, fluorophores, hough_sensitivity)
 
 w = warning('query', 'MATLAB:MKDIR:DirectoryExists');
 if (strcmp(w.state, 'on'))
@@ -12,9 +12,9 @@ end
 
 switch model_type
 	case 'spherical'
-		fsa.elm_spherical_analysis(input_dir, output_dir, pixel_size, hough_low, hough_high, segmentation, border, seed, fluorophores);
+		fsa.elm_spherical_analysis(input_dir, output_dir, pixel_size, hough_low, hough_high, segmentation, border, seed, fluorophores, hough_sensitivity);
 	case 'ellipsoidal'
-		fsa.elm_ellipsoidal_analysis(input_dir, output_dir, pixel_size, hough_low, hough_high, segmentation, border, seed, fluorophores);
+		fsa.elm_ellipsoidal_analysis(input_dir, output_dir, pixel_size, hough_low, hough_high, segmentation, border, seed, fluorophores, hough_sensitivity);
 	otherwise
 		error('Unsupported model type. Supported types are ''spherical'' and ''ellipsoidal''.');
 end
