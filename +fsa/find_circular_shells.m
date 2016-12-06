@@ -17,7 +17,7 @@ if(size(A, 2) > 1)
 	centres = A(:,1:2);
 	radii   = A(:,3);
 	metric  = A(:,4);
-	collisionRadius = 12;
+	collisionRadius = segment_half_size;
 	lp = 1;
 	while lp < length(radii) % For each candidate
 		dists = sqrt((centres(:,1)-centres(lp,1)).^2 + (centres(:,2)-centres(lp,2)).^2 );
