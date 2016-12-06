@@ -12,31 +12,26 @@ if(size(A, 2) > 1)
     A(A(:, 2) > size(image_data, 1) - (segment_half_size + edge_border) - 1, :) = [];
 end
 
-% Anti-collision filtering
+% Anti-collision filtering: removes double-detections of ellipsoids
 if(size(A, 2) > 1)
-    centres = A(:, 1:2);
-    [index3, distance] = rangesearch(centres, centres, 2 * segment_half_size);
-
-[dummy, index2] = sort(cellfun('size', index3, 2), 'descend');
-old_index = index3;
-index3 = index3(index2);
-%end
-
-% indices_remove = [];
-% for (i=1:length(index))
-% 	curr_indices = setdiff(index{i}, i);
-% 	curr_indices = find(old_index == curr_indices);
-% 	for(j=1:length(curr_indices))
-% 		index{curr_indices(j)} = index{curr_indices(j)}(index{curr_indices(j)} ~= i);
-% 	end
-% 	indices_remove = [indices_remove, curr_indices];
-% end
-% A(indices_remove, :) = [];
-
-centres = A(:, 1:2);
-radii   = A(:, 3);
-metric  = A(:, 4);
-
+	centres = A(:,1:2);
+	radii   = A(:,3);
+	metric  = A(:,4);
+	collisionRadius = 12;
+	lp = 1;
+	while lp < length(radii) % For each candidate
+		dists = sqrt((centres(:,1)-centres(lp,1)).^2 + (centres(:,2)-centres(lp,2)).^2 );
+		dists(lp) = collisionRadius + 100; % Don't exlcude the candidate due to itself
+		minDist = min(dists);
+		if(minDist<collisionRadius) % Exclude candidate if another is nearby
+			centres(lp,:) = [];
+			radii(lp) = [];
+			metric(lp) = [];
+			continue; % Allow list to shorten onto current lp index
+		else
+		lp = lp + 1;  % Move to next canditate
+		end
+	end
 end
 
 if (ShowPlot)

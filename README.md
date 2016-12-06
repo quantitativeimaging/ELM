@@ -27,7 +27,7 @@ For the best quantitative results, fluorescence microscopy should be performed t
 * __Separate spores.__ Well-separated images of individual spores. (Sparse spore images allow easy segmentation, and prevent the image-fitting from being spoiled by overlapping structures.)
 * __Lots of spores.__ Having lots of spore images (say 1000), provided they are well-separated, will provide a more robust average measurement of a protein layer position.
 * __In focus.__ Spores should be in-focus (e.g. the fluorescent coat should look as sharp as possible). They are assumed to all lie in the focal plane.
-* __ A dark background.__
+* __A dark background.__
 * __Bright spore coats.__ The brighter the fluorescence of the spore coat protein, the better the fit quality, but even dim images have been analysed successfully.
 * __Not saturated.__ The digital image should not be saturated. The pixel values in the digital image are assumed to be linearly proportional to the optical image brightness.
 * __Known scale.__ The width of the digital pixels needs to be known. We use a 100X objective lens with a Retiga 2000R camera, which gives a pixel width corresponding to 74 nm on the specimen. This is a good pixel size to use, because the 'ring-shaped' image of fluorescent shells can be resolved, and this is the structure that is analysed to infer the fluorescent shell size.
