@@ -44,12 +44,14 @@ for image_num = 1:length(input_files)
        Mxss = max(shell_segment_mat(:));
        Mnss = min(shell_segment_mat(:));
        caxis([Mnss, Mxss])
+			 % Try imsubtract so the file is saved sensibly too.
+       tiled_segments = imsubtract(tiled_segments,double(Mnss) );
     catch
        warning('Problem reshaping segments to set caxis'); 
     end
     
-	% Save segmented shell tiles
-	imwrite(mat2gray(tiled_segments), fullfile(output_dir, [image_basename, '_raw.tif']));
+	% Save segmented shell tiles% Try saving as 16-bit tif
+	imwrite(uint16(tiled_segments), fullfile(output_dir, [image_basename, '_raw.tif']));
 
 	% Fit all segmented shells. Display to the user one by one, if flag set
 	fits = cell(length(shell_segments) + 1, 1);
@@ -91,16 +93,20 @@ for image_num = 1:length(input_files)
 		% Fit shell to spore segment
 		[x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, residual] = fsa.fit_ellipsoid(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, actual_image);
         if(eccentricity<0) 
+					  % 0: If axis lengths are flipped, and 90 deg rot, and 
             % 1: Need to rename 'eccentricity' to 'aspectRatioMinusOne' or
             % a better fix by changing models to use aspect ratio
             % 2: This 'if statement' makes sure the semiminor_axis variable
             % does indeed store the short semiaxis length, and not the long
             % one due to any flip in fitting
+						% 3. Also need to fix orientation + 'equatoriality'
             correct_semiminor_axis = semiminor_axis*(1+eccentricity);
             correct_semimajor_axis = semiminor_axis;
             correct_eccentricity = correct_semimajor_axis/correct_semiminor_axis - 1;
             semiminor_axis = correct_semiminor_axis;
             eccentricity = correct_eccentricity;
+						orientation = mod( (orientation+3*pi/2), (2*pi))-pi; % check  
+						equatoriality = -1 + (1/(1+equatoriality)); % check!
         end
 		x_pos = centres(i, 1);
 		y_pos = centres(i, 2);
@@ -147,7 +153,7 @@ for image_num = 1:length(input_files)
 	% Save fit parameters
 	save(fullfile(output_dir, [image_basename, '_params.mat']), 'fits')
     
-    fid = fopen([output_dir, image_basename, '_params.csv'],'wt');
+    fid = fopen(fullfile(output_dir, [image_basename, '_params.csv']),'wt');
       fprintf(fid, [fitsHdr '\n']); % Write headers into what will be a csv
     fclose(fid);
     dlmwrite(fullfile(output_dir, [image_basename, '_params.csv']), cell2mat(fits(2:end)), '-append' )

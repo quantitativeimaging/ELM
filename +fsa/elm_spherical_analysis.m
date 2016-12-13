@@ -40,12 +40,13 @@ for image_num = 1:length(input_files)
        Mxss = max(shell_segment_mat(:));
        Mnss = min(shell_segment_mat(:));
        caxis([Mnss, Mxss])
+			 tiled_segments = imsubtract(tiled_segments,double(Mnss) );
     catch
        warning('Problem reshaping segments to set caxis'); 
     end
     
-	% Save segmented shell tiles
-	imwrite(mat2gray(tiled_segments), fullfile(output_dir, [image_basename, '_raw.tif']));
+	% Save segmented shell tiles % Change mat2gray to uint16 to save full dat
+	imwrite(uint16(tiled_segments), fullfile(output_dir, [image_basename, '_raw.tif']));
 
 	% Fit all segmented shells. Display to the user one by one, if flag set
 	fits = cell(length(shell_segments) + 1, 1);
@@ -119,7 +120,7 @@ for image_num = 1:length(input_files)
 	% Save fit parameters
 	save(fullfile(output_dir, [image_basename, '_params.mat']), 'fits')
     
-    fid = fopen([output_dir, image_basename, '_params.csv'],'wt');
+    fid = fopen(fullfile(output_dir, [image_basename, '_params.csv']),'wt');
       fprintf(fid, [fitsHdr '\n']); % Write headers into what will be a csv
     fclose(fid);
     dlmwrite(fullfile(output_dir, [image_basename, '_params.csv']), cell2mat(fits(2:end)), '-append' )
