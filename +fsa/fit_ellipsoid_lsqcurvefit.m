@@ -1,4 +1,4 @@
-function [x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, aspect_ratio, equatoriality, residual] = fit_ellipsoid_lsqcurvefit(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, aspect_ratio, equatoriality, actual_image)
+function [x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, aspect_ratio, equatoriality, residual] = fit_ellipsoid_lsqcurvefit(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, aspect_ratio, equatoriality, actual_image, ~)
 
 image_width = size(actual_image, 2);
 image_height = size(actual_image, 1);

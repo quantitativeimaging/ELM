@@ -24,11 +24,14 @@ for image_num = 1:length(input_files)
 
 	[~, image_basename, ~] = fileparts(image_filename);
 
-	% Find and display shells
+	% Find and display shells - and write to output for information.
 	figure(1)
 	[centres, radii, metric] = fsa.find_circular_shells(image_data, radius_lower, radius_upper, segment_half_size, edge_border, hough_sensitivity, true);
-	title(image_basename, 'interpreter', 'none')
-    
+	title(image_basename, 'interpreter', 'none');
+	figure_grab = getframe(1);
+	figure_grab = figure_grab.cdata;
+	imwrite(figure_grab,fullfile(output_dir,[image_basename,'_segments.png']));
+
     if(length(centres) < 1)
         continue
     end
@@ -144,7 +147,7 @@ for image_num = 1:length(input_files)
     % Display reconstruction as (non-scaled) image
     figure(5)
     imshow(sr_recon, [])
-    title(['Reconstructed image for', image_basename])
+    title(['Reconstructed image for',image_basename],'interpreter','none');
     
 	% Save fitted shell tiles
 	imwrite(mat2gray(sr_tiles), fullfile(output_dir, [image_basename, '_sr.tif']));

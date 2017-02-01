@@ -81,7 +81,7 @@ Try improving initial guess of psfVar before running relaxing this limit.
 10. Add (..., 'Sensitivity', value) to imfindcircles in find_circular_shells and make controllable. Default seems to be 0.85 currently - keep this default, but load explicitly on program start.
  * identified 29 Nov 2016
 
- >- Done, as default 0.85 sensitivity on startup, and editable and re-defualtable in advanced settings panel. 1 Dec 2016
+ >- Done, as default 0.85 sensitivity on startup, and editable and re-defaultable in advanced settings panel. 1 Dec 2016
 
 11. Write a reconstruction script that takes (fits, im_size, segment_half_size, scale_factor) as inputs.
  * Include nice scaling, and possibly number_of_fluorophores.
@@ -93,10 +93,48 @@ Try improving initial guess of psfVar before running relaxing this limit.
 
 13. Put in checkbox option to bring back debugging images.
  * It is hard to check that orientation fitting works properly without these.
+ >- Trying to do this debugging inside a parfor loop seems to be an absolute horror!!!
+ >- Probably it is easier to write a replacement script for debugging - try super-imposing candidate numbers on segment image to help select one for debugging.
 
 14. Resized GUI for correct display on Windows.
->- Done 2 Dec 2016. Not sure what it will look like on an Apple.
+ >- Done 2 Dec 2016. Not sure what it will look like on an Apple.
 
 15. Put in extra radiobutton for the ellipsoid fit that uses lsqcurvefit.
+ >- Or not, as I can't get it to work at the moment.
+ >- Note, ellipsoid fitting with ejr_unmod is actually really slow when trying to debug image analysis of large spores
+ >- just copy the ELM function, replace parfor i=1:n with a specific number, and feed it all the same input arguments (setting loads of input arguments might be easier if they are all captured as elm_parameters or something)
 
 16. Put in a thing to save 'raw_data_parameters'
+
+         elm_parameters = [etc.] % all inputs
+         % then
+         elm_bodge(elm_parameters) % to run non-parallel script
+
+## Identified circa 14 Dec 2016
+
+1. Need to adjust the iterative search step sizes in ejr_unmod when trying to fit images with large (exosporium) shells. Probably need to include these in advanced GUI.
+ >- Edited radius step size search to start at 1, not 0.75]
+ >-
+
+2. Give advanced GUI a persistent memory for parameters that have been set, rather than over-writing with defaults on each reopening.
+ >- Done
+
+3. Save segmentation image with boxes and candidate numbers into results folder.
+ >- Done.
+
+4. For larger spores (or lens with higher NA), we may need to incorporate the ellipsoidal PSF model (i.e. use about 1/11 effect of z position) into the ellipsoid image simulation. This was needed for larger cylindrical structures, and may be needed in the case of larger ellipsoids.
+ - Visually, this makes the simulated image core brighter.
+ - On testing, this doesn't help (at least unless the psd variance cap is 11 or higher. Maybe it does with a cap of about 7 close to the physical expectation?) -- It does. PArked on variance cap of 7, but including (1/11) z^2 contribution to distance.
+ - Really need to bring back debugging images.
+
+5. Change rejection sampling to brightness modulation.
+
+6. May need to switch rule from least squares to something more physical.
+
+
+
+Dear Adam,
+
+Attached is a quick cropped image from a 2-colour analysis using our ELM method. It is from the green exosporium / red polysaccharide image data.
+
+It is taking me a bit longer to adapt the ELM software for 2-colour than I'd hoped, but I should be able to improve on this a bit - the

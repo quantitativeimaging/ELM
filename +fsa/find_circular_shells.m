@@ -17,7 +17,7 @@ if(size(A, 2) > 1)
 	centres = A(:,1:2);
 	radii   = A(:,3);
 	metric  = A(:,4);
-	collisionRadius = segment_half_size;
+	collisionRadius = segment_half_size * 1.3; % *1.3 is arbitary
 	lp = 1;
 	while lp < length(radii) % For each candidate
 		dists = sqrt((centres(:,1)-centres(lp,1)).^2 + (centres(:,2)-centres(lp,2)).^2 );
@@ -45,6 +45,9 @@ if (ShowPlot)
 		x = centres(i, 1) - segment_half_size;
 		y = centres(i, 2) - segment_half_size;
 		rectangle('Position', [x, y, segment_half_size*2, segment_half_size*2], 'EdgeColor', 'r')
+		dx = 5; 
+    dy = -1; % displacement so the text does not overlay the data points
+    text(centres(i,1)+dx, centres(i,2)+dy, int2str(i), 'color','g','fontSize',12);
 	end
 	hold on
 	rectangle('Position', [edge_border, edge_border, size(image_data, 2) - 2*edge_border, size(image_data, 1) - 2*edge_border], 'EdgeColor', 'g')

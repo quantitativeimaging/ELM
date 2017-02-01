@@ -1,6 +1,6 @@
 function [x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, residual] = fit_ellipsoid_ejr_unmod(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, actual_image, ~)
 
-maxVar        = 16; % Prevent PSF width getting stuck at high values.
+maxVar        = 7; % Prevent PSF width getting stuck at high values.
 flagFixedBlur = 0;  % Or set to 1 to disallow PSF width from varying.
 
 b0 = [x_shift, y_shift, semiminor_axis, psf_variance, height, eccentricity, orientation, equatoriality];
@@ -17,8 +17,8 @@ y = -(1:image_height) + image_centre_y;
 [x, y] = meshgrid(x, y);
 X = [x(:), y(:)];
 
-radX   = 0.75;
-radY   = 0.75;
+radX   = 1; %0.75;
+radY   = 1; %0.75;
 radR   = 0.2 * b0(3);
 radVar = 0.5 * b0(4);
 radHt  = 0.1 * b0(5);

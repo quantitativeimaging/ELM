@@ -61,6 +61,14 @@ guidata(hObject, handles);
 % UIWAIT makes advanced_settings wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
+% Set string values in gui from appdata, not the gui figure:
+set(handles.radius_low_edit, 'String', getappdata(0, 'radius_low'));
+set(handles.radius_high_edit, 'String', getappdata(0, 'radius_high'));
+set(handles.segmentation_edit, 'String', getappdata(0, 'segmentation'));
+set(handles.border_edit, 'String', getappdata(0, 'border'));
+set(handles.seed_edit, 'String', getappdata(0, 'seed'));
+set(handles.fluorophores_edit, 'String', getappdata(0, 'fluorophores'));
+set(handles.hough_sensitivity_edit, 'String', getappdata(0, 'hough_sensitivity'));
 
 % --- Outputs from this function are returned to the command line.
 function varargout = advanced_settings_OutputFcn(hObject, eventdata, handles) 

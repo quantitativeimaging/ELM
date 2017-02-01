@@ -33,7 +33,7 @@ num_points_accepted = length(surface_x);
 % Calculate intensities
 I = zeros([size(X, 1), 1]);
 for point = 1:num_points_accepted
-	square_displacements = ((surface_x(point) - X(:, 1) ).^2 + (surface_y(point) - X(:, 2) ).^2 + (z_axis(point)).^2 );
+	square_displacements = ((surface_x(point) - X(:, 1) ).^2 + (surface_y(point) - X(:, 2) ).^2 + (1/11)*(z_axis(point)).^2 );
 	intensities = exp(-(square_displacements) / (2 * abs(psf_variance)));
 	I = I + intensities;
 end
