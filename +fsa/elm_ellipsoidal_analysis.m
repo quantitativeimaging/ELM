@@ -21,6 +21,11 @@ for image_num = 1:length(input_files)
 	end
 
 	image_data = imread(fullfile(input_dir, image_filename));
+	if(ndims(image_data)==3)
+		if(size(image_data,3)==4) % 
+			image_data = mean(image_data(:,:,1:3), 3);
+		end
+	end
 
 	[~, image_basename, ~] = fileparts(image_filename);
 
@@ -66,10 +71,11 @@ for image_num = 1:length(input_files)
 		background = median(actual_image(actual_image < mean(actual_image(:))));
 		actual_image = double(actual_image - background);
 
-		bw_image = actual_image;
-		threshold = 35 - background;
-		bw_image(actual_image > threshold) = 1;
-		bw_image(actual_image <= threshold) = 0;
+		% bw_image = actual_image;      % removed 10 feb 2017
+		% threshold = 35 - background;  % removed 10 feb 2017
+		% bw_image(actual_image > threshold) = 1;
+		% bw_image(actual_image <= threshold) = 0;
+		bw_image = ( actual_image > mean(actual_image(:) ));
 
 		stats = regionprops(bw_image, 'Centroid', 'MajorAxisLength', 'MinorAxisLength', 'Orientation', 'Area');
 
