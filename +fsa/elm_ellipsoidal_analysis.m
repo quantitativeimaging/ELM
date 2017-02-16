@@ -61,11 +61,14 @@ for image_num = 1:length(input_files)
 	% Save segmented shell tiles% Try saving as 16-bit tif
 	imwrite(uint16(tiled_segments), fullfile(output_dir, [image_basename, '_raw.tif']));
 
-	% Fit all segmented shells. Display to the user one by one, if flag set
+	% Fit all segmented shells. 
+	% Store output in cell array called 'fits', with text headers
+	% And store headers + numbers in fitData and fitHdr for easier Matlab use
 	fits = cell(length(shell_segments) + 1, 1);
-    % Write headers in first row, and  copy as a string for file output
+	fitData = -ones(length(shell_segments), 11);
+	% Write headers in first row, and  copy as a string for file output
 	fits{1} = {'x segment pos', 'y segment pos', 'x shift', 'y shift', 'orientation', 'semiminor axis', 'PSF variance', 'brightness', 'aspectRatioMinusOne', 'equatoriality', 'residual'};
-    fitsHdr = ['x segment pos,   y segment pos,   x shift,   y shift,   orientation,   semiminor axis,   PSF variance,   brightness,   aspectRatioMinusOne,   equatoriality,   residual'];
+	fitsHdr = ['x segment pos,   y segment pos,   x shift,   y shift,   orientation,   semiminor axis,   PSF variance,   brightness,   aspectRatioMinusOne,   equatoriality,   residual'];
     parfor i=1:length(shell_segments)
 		actual_image = shell_segments{i};
 		background = median(actual_image(actual_image < mean(actual_image(:))));
@@ -79,19 +82,18 @@ for image_num = 1:length(input_files)
 
 		stats = regionprops(bw_image, 'Centroid', 'MajorAxisLength', 'MinorAxisLength', 'Orientation', 'Area');
 
-        % stats = regionprops(imSpore > mean(imSpore(:)),'Area','Orientation','Centroid');
-        areas       = cat(1, stats.Area);
-        orientations= cat(1, stats.Orientation);
-        centroids   = cat(1, stats.Centroid);
-        dat2  = [areas, orientations, centroids];
-        dat2  = sortrows(dat2); % Sort by first row (Area) ascending
-        orientation = dat2(end,2)*(pi/180); % estimate major axis orientation
-        centroid    = dat2(end, 3:4);       % [X, Y] or [COL, ROW] estimate 
+		% stats = regionprops(imSpore > mean(imSpore(:)),'Area','Orientation','Centroid');
+		areas       = cat(1, stats.Area);
+		orientations= cat(1, stats.Orientation);
+		centroids   = cat(1, stats.Centroid);
+		dat2  = [areas, orientations, centroids];
+		dat2  = sortrows(dat2); % Sort by first row (Area) ascending
+		orientation = dat2(end,2)*(pi/180); % estimate major axis orientation
+		centroid    = dat2(end, 3:4);       % [X, Y] or [COL, ROW] estimate 
         
 		x_shift = centroid(1) - segment_half_size - 1;
 		y_shift = centroid(2) - segment_half_size - 1;
 		% orientation =  -1; % Arbitrary initial guess
-        
         
 		semiminor_axis = 6;
 		psf_variance = 8;
@@ -120,7 +122,10 @@ for image_num = 1:length(input_files)
 		x_pos = centres(i, 1);
 		y_pos = centres(i, 2);
 		fits{i+1} = [x_pos, y_pos, x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, residual];
-	end
+		fitData(i, :) = [x_pos, y_pos, x_shift, y_shift, orientation, ...
+                        semiminor_axis, psf_variance, height, ...
+												eccentricity, equatoriality, residual];
+		end
 
 	% Fitted segments
 	fit_segments = cell(length(shell_segments));
@@ -160,7 +165,7 @@ for image_num = 1:length(input_files)
     imwrite(mat2gray(sr_recon), fullfile(output_dir, [image_basename, '_recon.tif']));
 
 	% Save fit parameters
-	save(fullfile(output_dir, [image_basename, '_params.mat']), 'fits')
+	save(fullfile(output_dir, [image_basename, '_params.mat']), 'fits', 'fitsHdr', 'fitData', 'shell_segments')
     
     fid = fopen(fullfile(output_dir, [image_basename, '_params.csv']),'wt');
       fprintf(fid, [fitsHdr '\n']); % Write headers into what will be a csv
