@@ -132,9 +132,15 @@ Try improving initial guess of psfVar before running relaxing this limit.
 6. May need to switch rule from least squares to something more physical.
 
 
-
 Dear Adam,
 
 Attached is a quick cropped image from a 2-colour analysis using our ELM method. It is from the green exosporium / red polysaccharide image data.
 
 It is taking me a bit longer to adapt the ELM software for 2-colour than I'd hoped, but I should be able to improve on this a bit - the
+
+
+### 15 Feb 2017
+Edits to work on processing two colour data.
+1. Note that, if fitting is done with the PSF variance not constrained to the relatively low values of a good fit, then fits with a large PSF variance can be culled in a later quality control step and this seems to provide a good way of excluding overlapping images and poor fits.
+
+2. 
