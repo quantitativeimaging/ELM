@@ -1,30 +1,46 @@
 % myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2016_IIB_Yao_Annie\2016_11_28_results_try2\';
 % myFolder = 'D:\EJR\Projects\2016_IIB_spores\2017_02_08_filter_test\results\';
 % myFolder = 'D:\data\2B_spores\results_2017_02_09\';
-myFolder = 'D:\data\2B_spores\results_2017_02_15\';
+
+% myFolder = 'D:\data\2B_spores\results_2017_02_15\';
+
+% 2017: March, Driks:
+myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2016_Driks\2017_03_14_data\R_G_output\';
+
+% myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_GerP\2017_03_20_output\';
+% myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2016_Driks\2017_03_09_data\output\'
+% 2017 April Abhi:
+% myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_GerP\2017_04_06_output\';
+myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_GerP\2017_03_20_output_spherical\';
 
 listMats = dir([myFolder, '*.mat']); % in current directory
 
 number_of_results = length(listMats);
 
-listMeanEquivRad = -ones(number_of_results, 1);
-listMedianVar = -ones(number_of_results, 1);
+listMeanEquivRad     = -ones(number_of_results, 1);
+listMedianVar        = -ones(number_of_results, 1);
 listCroppedEquivRads = -ones(number_of_results, 1);
+listQualityCheckFirst = zeros(number_of_results, 1);
+listNumberAccepted   = zeros(number_of_results, 1);
 
 for lp = 1:number_of_results
 	load([myFolder, listMats(lp).name]);
 	
-	fitData = fits(2:end);
-	fitData = cell2mat(fitData);
+	% fitData = fits(2:end); % fitData should now just be loaded. 
+	% fitData = cell2mat(fitData);
 	equiv_rads = (fitData(:,6).*((1+fitData(:,9)).^(1/3)))*74;
 	
 	listMeanEquivRad(lp) = median(equiv_rads);
 	listMeanEquivVar(lp) = median(fitData(:,7));
 
 	filename= listMats(lp).name;
-	filename_stem = filename(1:16);
-	listFilenames(lp,1:16) = filename_stem;
-	
+	if(length(filename) >=16 )
+  	filename_stem = filename(1:16);
+		listFilenames(lp,1:16) = filename_stem;
+	else
+		filename_stem = 'sample';
+		listFilenames(lp,1) = 'a';
+	end
 % 	figure(1)
 % 	scatter(fit_data(:,11), equiv_rads)
 % 	title(filename_stem)
@@ -36,20 +52,26 @@ for lp = 1:number_of_results
 
 qualityCheck = ones(size(fitData,1), 1);
 qualityCheck( (fitData(:,7)>10) ) = 0; % Fails check if fit too blurred 
-qualityCheck( equiv_rads < 380 ) = 0; % Fails check if fit is too small
+qualityCheck( equiv_rads < 300 ) = 0; % Fails check if fit is too small
 qualityCheck( equiv_rads > 700 ) = 0; % Fails check if fit is too large
 
 tiled_assessed_segments = tile_assessed_segments(shell_segments, qualityCheck);
 
+% listQualityCheckFirst(lp) = qualityCheck(1); % For one spore per frame
+
   figure(2)
 	crop_equiv_rads = equiv_rads;
 	crop_equiv_rads(fitData(:,7)>10)=[]; % Remove poor (too blurred) fits
-	crop_equiv_rads(crop_equiv_rads<380)=[]; % Remove implausibly small fits
+	crop_equiv_rads(crop_equiv_rads<300)=[]; % Remove implausibly small fits
 	crop_equiv_rads(crop_equiv_rads>700)=[]; % Remove implausibly large fits
 	listCroppedEquivRads(lp) = mean(crop_equiv_rads);
+	listNumberAccepted(lp) = sum(qualityCheck);
 	
- 	hist(crop_equiv_rads, [380:5:700]);
+ 	hist(crop_equiv_rads, [300:5:700]);
  	title(filename_stem)
+	xlabel('Equivalent radius / nm')
+	ylabel('number')
+	set(gca, 'fontSize', 14)
 
 	
   figure(6)
@@ -59,9 +81,10 @@ tiled_assessed_segments = tile_assessed_segments(shell_segments, qualityCheck);
 	hold off
 	xlabel('r_{equivalent} / nm')
  	ylabel('PSF blur variance')
+	legend('rejected', 'accepted')
 	title(filename_stem)
-	xlim([400 800])
-	ylim([4 12])
+	xlim([200 800])
+	ylim([4 16])
 
 	
 %   figure (9)
@@ -88,7 +111,7 @@ tiled_assessed_segments = tile_assessed_segments(shell_segments, qualityCheck);
 % listCroppedEquivRads(lp) = mean(crop_equiv_rads)
 	
 	drawnow;
-	 pause
+	% pause
 end
 
 figure(8)

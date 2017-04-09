@@ -5,8 +5,14 @@ function tiled_assessed_segments = tile_assessed_segments(shell_segments, qualit
 num_segments = length(shell_segments);
 num_rows = floor(sqrt(num_segments));
 num_cols = ceil(num_segments / num_rows);
-segment_size = size(shell_segments{1}, 1);
-
+if(num_segments>0)
+  segment_size = size(shell_segments{1}, 1);
+else
+	segment_size = 1; % Prevent empty arrays breaking indexing?
+	num_rows = 1;
+	num_cols = 1;
+end
+	
 tiled_assessed_segments = zeros(num_rows * segment_size, num_cols * segment_size);
 
 for i=1:num_segments
@@ -29,5 +35,6 @@ for i=1:num_segments
 	end
 end
 hold off
+axis equal % avoid stretch
 
 end
