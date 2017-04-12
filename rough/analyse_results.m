@@ -1,17 +1,40 @@
+% Script to post-process data from the 'output' folder of ELM software
+% Eric Rees, 2017 CC-BY
+%
+% NOTES
+% 1. The ELM software produces a folder with pictures and a MAT file for each
+% input image file.
+% 2. This script reads each MAT file in the target folder. Fitted spore
+% candidates that pass quality control are used to get a results.
+% 3. The results for all the files can then be copy-pasted to Excel
+% 4. A hard-coded pixel width is set in this script (default: 74 nm)
+
+% QUALITY CONTROL
+%  Shell not too huge (e.g. > 700 nm radius)
+%  Shell not too small (e.g. < 300 nm radius)
+%  Shell not too blurred (which often means > 1 spore, or a bad fit).
+%
+% OUTPUT
+%  'listFilenames' - the first 16 characters of each filename
+%  'listCroppedEquivRads' - the mean radius after quality control
+
 % myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2016_IIB_Yao_Annie\2016_11_28_results_try2\';
 % myFolder = 'D:\EJR\Projects\2016_IIB_spores\2017_02_08_filter_test\results\';
 % myFolder = 'D:\data\2B_spores\results_2017_02_09\';
 
 % myFolder = 'D:\data\2B_spores\results_2017_02_15\';
 
-% 2017: March, Driks:
-myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2016_Driks\2017_03_14_data\R_G_output\';
+% 2017: March, Driks, exosporium and PS (polysaccharide):
+% myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2016_Driks\2017_03_14_data\R_G_output\';
 
 % myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_GerP\2017_03_20_output\';
 % myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2016_Driks\2017_03_09_data\output\'
-% 2017 April Abhi:
+% 2017 April Abhi Ghosh, cereus:
 % myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_GerP\2017_04_06_output\';
-myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_GerP\2017_03_20_output_spherical\';
+% myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_GerP\2017_03_20_output_spherical\';
+% myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_GerP\2017_04_10_output\';
+% myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_GerP\2017_04_11_output\';
+myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_GerP\2017_04_12_output\';
 
 listMats = dir([myFolder, '*.mat']); % in current directory
 
