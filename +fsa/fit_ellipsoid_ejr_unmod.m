@@ -17,8 +17,8 @@ y = -(1:image_height) + image_centre_y;
 [x, y] = meshgrid(x, y);
 X = [x(:), y(:)];
 
-radX   = 1; %0.75;
-radY   = 1; %0.75;
+radX   = 1.5; %0.75;
+radY   = 1.5; %0.75;
 radR   = 0.2 * b0(3);
 radVar = 0.5 * b0(4);
 radHt  = 0.1 * b0(5);
