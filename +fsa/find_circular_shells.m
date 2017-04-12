@@ -1,7 +1,8 @@
 function [centres, radii, metric] = find_circular_shells(image_data, radius_lower, radius_upper, segment_half_size, edge_border, hough_sensitivity, ShowPlot);
 
-[centres, radii, metric] = imfindcircles(image_data, [radius_lower radius_upper], 'Sensitivity', hough_sensitivity);
+flagExcludeAll = 1; % If 1, exclude collisions strictly to counter clumps
 
+[centres, radii, metric] = imfindcircles(image_data, [radius_lower radius_upper], 'Sensitivity', hough_sensitivity);
 
 % Remove candidates near edge
 A = [centres, radii, metric];
@@ -23,13 +24,24 @@ if(size(A, 2) > 1)
 		dists = sqrt((centres(:,1)-centres(lp,1)).^2 + (centres(:,2)-centres(lp,2)).^2 );
 		dists(lp) = collisionRadius + 100; % Don't exlcude the candidate due to itself
 		minDist = min(dists);
-		if(minDist<collisionRadius) % Exclude candidate if another is nearby
+		
+		if(flagExcludeAll == 1) % To exlude all candidates in clumps of 3+
+		  indexOfClumpers = find((dists < collisionRadius));
+			if( length(indexOfClumpers) > 1 ) % group of 2 = 1 clash = ellipsoid
+				indexOfClumpers = [indexOfClumpers;lp];
+				centres(indexOfClumpers,:) = [];
+				radii(indexOfClumpers) = [];
+				metric(indexOfClumpers) = [];
+			end
+		end
+		
+		if(minDist<collisionRadius) % Exclude candidate if one other is nearby
 			centres(lp,:) = [];
 			radii(lp) = [];
 			metric(lp) = [];
 			continue; % Allow list to shorten onto current lp index
 		else
-		lp = lp + 1;  % Move to next canditate
+			lp = lp + 1;  % Move to next canditate
 		end
 	end
 end
