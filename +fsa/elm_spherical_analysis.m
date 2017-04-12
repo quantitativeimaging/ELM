@@ -50,9 +50,11 @@ for image_num = 1:length(input_files)
 
 	% Fit all segmented shells. Display to the user one by one, if flag set
 	fits = cell(length(shell_segments) + 1, 1);
+	fitData = -ones(length(shell_segments), 11);
     % Write headers in first row, and  copy as a string for file output
 	fits{1} = {'x segment pos', 'y segment pos', 'x shift', 'y shift', 'radius', 'PSF sigma', 'brightness', 'residual'};
-    fitsHdr = ['x segment pos,   y segment pos,   x shift,   y shift,   radius,   PSF sigma,   brightness,   residual'];
+	fitsHdr = ['x segment pos,   y segment pos,   x shift,   y shift,   orientation,   semiminor axis,   PSF variance,   brightness,   aspectRatioMinusOne,   equatoriality,   residual'];
+  %  fitsHdr = ['x segment pos,   y segment pos,   x shift,   y shift,   radius,   PSF sigma,   brightness,   residual'];
 	parfor i=1:length(shell_segments)
 		actual_image = shell_segments{i};
 		background = median(actual_image(actual_image < mean(actual_image(:))));
@@ -77,6 +79,9 @@ for image_num = 1:length(input_files)
 		x_pos = centres(i, 1);
 		y_pos = centres(i, 2);
 		fits{i+1} = [x_pos, y_pos, x_centre_fit, y_centre_fit, radius_fit, psf_sigma_fit, height_fit, residual];
+		fitData(i, :) = [x_pos, y_pos, x_centre_fit, y_centre_fit, 0, ...
+                        radius_fit, psf_sigma_fit.^2, height_fit, ...
+												0, 0, residual];
 	end
 
 	% Fitted segments
@@ -118,7 +123,7 @@ for image_num = 1:length(input_files)
     imwrite(mat2gray(sr_recon), fullfile(output_dir, [image_basename, '_recon.tif']));
 
 	% Save fit parameters
-	save(fullfile(output_dir, [image_basename, '_params.mat']), 'fits')
+	save(fullfile(output_dir, [image_basename, '_params.mat']), 'fits', 'fitsHdr', 'fitData', 'shell_segments')
     
     fid = fopen(fullfile(output_dir, [image_basename, '_params.csv']),'wt');
       fprintf(fid, [fitsHdr '\n']); % Write headers into what will be a csv
