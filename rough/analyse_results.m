@@ -91,8 +91,8 @@ tiled_assessed_segments = tile_assessed_segments(shell_segments, qualityCheck);
 	listNumberAccepted(lp) = sum(qualityCheck);
 	
  	hist(crop_equiv_rads, [300:5:700]);
- 	title(filename_stem)
-	xlabel('Equivalent radius / nm')
+ 	title(filename_stem, 'interpreter', 'none')
+	xlabel('Equivalent radius / nm');
 	ylabel('number')
 	set(gca, 'fontSize', 14)
 
