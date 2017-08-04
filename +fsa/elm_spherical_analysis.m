@@ -52,7 +52,7 @@ for image_num = 1:length(input_files)
 	fits = cell(length(shell_segments) + 1, 1);
 	fitData = -ones(length(shell_segments), 11);
     % Write headers in first row, and  copy as a string for file output
-	fits{1} = {'x segment pos', 'y segment pos', 'x shift', 'y shift', 'radius', 'PSF sigma', 'brightness', 'residual'};
+	fits{1} = {'x segment pos,   y segment pos,   x shift,   y shift,   orientation,   semiminor axis,   PSF variance,   brightness,   aspectRatioMinusOne,   equatoriality,   residual'};
 	fitsHdr = ['x segment pos,   y segment pos,   x shift,   y shift,   orientation,   semiminor axis,   PSF variance,   brightness,   aspectRatioMinusOne,   equatoriality,   residual'];
   %  fitsHdr = ['x segment pos,   y segment pos,   x shift,   y shift,   radius,   PSF sigma,   brightness,   residual'];
 	parfor i=1:length(shell_segments)
@@ -78,7 +78,8 @@ for image_num = 1:length(input_files)
 
 		x_pos = centres(i, 1);
 		y_pos = centres(i, 2);
-		fits{i+1} = [x_pos, y_pos, x_centre_fit, y_centre_fit, radius_fit, psf_sigma_fit, height_fit, residual];
+		fits{i+1} = [x_pos, y_pos, x_centre_fit, y_centre_fit, 0, ...
+			           radius_fit, psf_sigma_fit.^2, height_fit, 0, 0, residual];
 		fitData(i, :) = [x_pos, y_pos, x_centre_fit, y_centre_fit, 0, ...
                         radius_fit, psf_sigma_fit.^2, height_fit, ...
 												0, 0, residual];
@@ -88,7 +89,8 @@ for image_num = 1:length(input_files)
 	fit_segments = cell(length(shell_segments));
 	for i=1:length(fit_segments)
 		fit = fits{i+1};
-		fit_image = fsa.image_sphere_thin(fit(3), fit(4), fit(5), fit(6), fit(7), shell_segments{i});
+		% image_sphere_thin((x_centre, y_centre, radius, psf_sigma, height, imagemat)
+		fit_image = fsa.image_sphere_thin(fit(3), fit(4), fit(6), sqrt(fit(7)), fit(8), shell_segments{i});
 		fit_segments{i} = fit_image;
 	end
 	fit_tiles = fsa.tile_segments(fit_segments);
@@ -103,7 +105,8 @@ for image_num = 1:length(input_files)
 	sr_segments = cell(length(shell_segments));
 	for i=1:length(sr_segments)
 		fit = fits{i+1};
-		sr_image = fsa.image_sphere_thin(fit(3), fit(4), fit(5), 1, fit(7), shell_segments{i});
+		% image_sphere_thin((x_centre, y_centre, radius, psf_sigma, height, imagemat)
+		sr_image = fsa.image_sphere_thin(fit(3), fit(4), fit(6), 1, fit(8), shell_segments{i});
 		sr_segments{i} = sr_image;
 	end
 	sr_tiles = fsa.tile_segments(sr_segments);
