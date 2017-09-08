@@ -65,14 +65,15 @@ for image_num = 1:length(input_files)
 	% Store output in cell array called 'fits', with text headers
 	% And store headers + numbers in fitData and fitHdr for easier Matlab use
 	fits = cell(length(shell_segments) + 1, 1);
-	fitData = -ones(length(shell_segments), 11);
+	fitData = -ones(length(shell_segments), 12);
 	% Write headers in first row, and  copy as a string for file output
-	fits{1} = {'x segment pos', 'y segment pos', 'x shift', 'y shift', 'orientation', 'semiminor axis', 'PSF variance', 'brightness', 'aspectRatioMinusOne', 'equatoriality', 'residual'};
-	fitsHdr = ['x segment pos,   y segment pos,   x shift,   y shift,   orientation,   semiminor axis,   PSF variance,   brightness,   aspectRatioMinusOne,   equatoriality,   residual'];
+	fits{1} = {'x segment pos', 'y segment pos', 'x shift', 'y shift', 'orientation', 'semiminor axis', 'PSF variance', 'brightness', 'aspectRatioMinusOne', 'equatoriality', 'residual', 'sum_square_signal'};
+	fitsHdr = ['x segment pos,   y segment pos,   x shift,   y shift,   orientation,   semiminor axis,   PSF variance,   brightness,   aspectRatioMinusOne,   equatoriality,   residual, sum_square_signal'];
     parfor i=1:length(shell_segments)
 		actual_image = shell_segments{i};
 		background = median(actual_image(actual_image < mean(actual_image(:))));
 		actual_image = double(actual_image - background);
+		sum_square_signal = sum( ((actual_image(:))).^2 );
 
 		% bw_image = actual_image;      % removed 10 feb 2017
 		% threshold = 35 - background;  % removed 10 feb 2017
@@ -121,10 +122,11 @@ for image_num = 1:length(input_files)
         end
 		x_pos = centres(i, 1);
 		y_pos = centres(i, 2);
-		fits{i+1} = [x_pos, y_pos, x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, residual];
+		fits{i+1} = [x_pos, y_pos, x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, residual, sum_square_signal];
 		fitData(i, :) = [x_pos, y_pos, x_shift, y_shift, orientation, ...
                         semiminor_axis, psf_variance, height, ...
-												eccentricity, equatoriality, residual];
+												eccentricity, equatoriality, residual, ...
+												sum_square_signal];
 		end
 
 	% Fitted segments

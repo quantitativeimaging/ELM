@@ -34,14 +34,15 @@
 % myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_GerP\2017_03_20_output_spherical\';
 % myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_GerP\2017_04_10_output\';
 % myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_GerP\2017_04_11_output\';
-% myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_GerP\2017_04_12_output\';
+
+% myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_GerP\2017_04_12_output_B\';
+% myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_GerP\2017_04_11_output_B\';
+% myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_GerP\2017_04_10_output_B\';
+% myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_GerP\2017_03_20_output_B\';
+myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_GerP\2017_04_06_output_B\';
 
 % Bailey spores June 2017:
-% myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_Spores_Dave_Bailey\2017-06-26_mCherry_only_output_not_quite_finished\';
-% After biocide treatment:
-% myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_Spores_Dave_Bailey\2017_06_27_full_output\'
-% A few test files:
-myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_Spores_Dave_Bailey\test2_out\'
+%myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_Spores_Dave_Bailey\2017_06_26_full_output\';
 
 % Doerte 2-colour
 % myFolder = 'D:\EJR_OneDrive\OneDrive - University Of Cambridge\Projects\2017_Doerte_spores\Exo_and_PS_results\';
@@ -50,69 +51,49 @@ listMats = dir([myFolder, '*.mat']); % in current directory
 
 number_of_results = length(listMats);
 
-listMeanEquivRad     = -ones(number_of_results, 1);
+listMeanEquivRad     = -ones(number_of_results, 1);  
 listMedianVar        = -ones(number_of_results, 1);
 listCroppedEquivRads = -ones(number_of_results, 1);
 listQualityCheckFirst = zeros(number_of_results, 1);
 listNumberAccepted   = zeros(number_of_results, 1);
-listNumberRejected   = zeros(number_of_results, 1);
+listCroppedPercentResidual =zeros(number_of_results, 1);
 
 for lp = 1:number_of_results
 	lp
 	load([myFolder, listMats(lp).name]);
 	
-	% fitData = fits(2:end); % fitData should now just be loaded. 
-	% fitData = cell2mat(fitData);
-	equiv_rads = ( fitData(:,6).*((1+fitData(:,9)).^(1/3)) )*74;
+	% % fitData should load OK - if not, read from fits cellarray
+	%   fitData = fits(2:end); % fitData should now just be loaded. 
+	%   fitData = cell2mat(fitData);
+	equiv_rads = (fitData(:,6).*((1+fitData(:,9)).^(1/3)))*74;
 	
-	listMeanEquivRad(lp) = median(equiv_rads);
-	listMeanEquivVar(lp) = median(fitData(:,7));
+	% listMedianEquivRad(lp) = median(equiv_rads);
+	% listMedianEquivVar(lp) = median(fitData(:,7));
 
 	filename= listMats(lp).name;
-	if(length(filename) >=15 )
-  	filename_stem = filename(1:15);
-		listFilenames(lp,1:15) = filename_stem;
+	if(length(filename) >=16 )
+  	filename_stem = filename(1:16);
+		listFilenames(lp,1:16) = filename_stem;
 	else
 		filename_stem = 'sample';
 		listFilenames(lp,1) = 'a';
 	end
-% 	figure(1)
-% 	scatter(fit_data(:,11), equiv_rads)
-% 	title(filename_stem)
-% 	ylim([350 600])
-% 	xlim([0 300000])
-% 	hold on
-% 	 plot([0 30000], [listMeanEquivRad(lp), listMeanEquivRad(lp)], 'r')
-% 	hold off
 
 qualityCheck = ones(size(fitData,1), 1);
-qualityCheck( (fitData(:,7)>8) ) = 0; % Fails check if fit too blurred 
+qualityCheck( (fitData(:,7)>10) ) = 0; % Fails check if fit too blurred 
 qualityCheck( equiv_rads < 300 ) = 0; % Fails check if fit is too small
 qualityCheck( equiv_rads > 700 ) = 0; % Fails check if fit is too large
 
-tiled_assessed_segments = tile_assessed_segments(shell_segments, qualityCheck);
 
-% listQualityCheckFirst(lp) = qualityCheck(1); % For one spore per frame
-
-  figure(2)
-	crop_equiv_rads = equiv_rads;
-	crop_equiv_rads(fitData(:,7)>8)=[]; % Remove poor (too blurred) fits
-	crop_equiv_rads(crop_equiv_rads<300)=[]; % Remove implausibly small fits
-	crop_equiv_rads(crop_equiv_rads>700)=[]; % Remove implausibly large fits
-	listCroppedEquivRads(lp) = mean(crop_equiv_rads);
+  % figure(2)
+	% crop_equiv_rads = equiv_rads;
+	% crop_equiv_rads(fitData(:,7)>12)=[]; % Remove poor (too blurred) fits
+	% crop_equiv_rads(crop_equiv_rads<300)=[]; % Remove implausibly small fits
+	% crop_equiv_rads(crop_equiv_rads>700)=[]; % Remove implausibly large fits
+	listCroppedEquivRads(lp) = mean(equiv_rads(qualityCheck==1));
 	listNumberAccepted(lp) = sum(qualityCheck);
-	listNumberRejected(lp) = length(equiv_rads) - listNumberAccepted(lp);
-	
- 	hist(crop_equiv_rads, [300:10:700]);
- 	title(filename_stem, 'interpreter', 'none')
-	xlabel('Equivalent radius / nm');
-	ylabel('number')
-	set(gca, 'fontSize', 14)
-	xlim([300 700])
-	% Write a separate script to collate all cropped equiv rad from a folder
-
-	
-  figure(6)
+	  
+	figure(6)	
 	scatter(equiv_rads, fitData(:,7), 'r')
 	hold on
 	 scatter(equiv_rads(find(qualityCheck)), fitData(find(qualityCheck),7), 'b')
@@ -123,33 +104,14 @@ tiled_assessed_segments = tile_assessed_segments(shell_segments, qualityCheck);
 	title(filename_stem)
 	xlim([200 800])
 	ylim([4 16])
-
 	
-%   figure (9)
-%   scatter(equiv_rads, fit_data(:,7));
-%   title(filename_stem)
-% 	ylim([350 600])
-%   xlim([0 16])
-% 	hold on
-%    plot([0 16], [listMeanEquivRad(lp), listMeanEquivRad(lp)], 'r')
-%   hold off
-% 		hold on
-%    plot([mean(fit_data(:,7)) mean(fit_data(:,7))], [350, 600], 'r')
-%   hold off
-% 	set(gca, 'fontSize', 14)
-% 	xlabel('r_{equivalent} / nm')
-% 	ylabel('PSF blur variance')
+	% get residual as a % of 'signal energy'
+	if(size(fitData,2)>=12) % If the 'sum of square signal' column exists
+		percentResidual = fitData(:,11)./fitData(:,12);
+		listCroppedPercentResidual(lp) = mean(percentResidual(qualityCheck==1));
+	end
 
-% % For YAo + Annie:
-% equiv_rads = (fit_data(:,6).*((1+fit_data(:,9)).^(1/3)))*74;
-% crop_equiv_rads = equiv_rads;
-% crop_equiv_rads(fit_data(:,7)>9)=[]; % Remove poor (too blurred) fits
-% crop_equiv_rads(crop_equiv_rads<380)=[]; % Remove implausibly small fits
-% crop_equiv_rads(crop_equiv_rads>700)=[]; % Remove implausibly large fits
-% listCroppedEquivRads(lp) = mean(crop_equiv_rads)
-	
-	% drawnow;
-	% pause
+	%pause
 end
 
 figure(8)

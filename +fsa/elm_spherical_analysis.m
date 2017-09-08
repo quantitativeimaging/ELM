@@ -50,15 +50,16 @@ for image_num = 1:length(input_files)
 
 	% Fit all segmented shells. Display to the user one by one, if flag set
 	fits = cell(length(shell_segments) + 1, 1);
-	fitData = -ones(length(shell_segments), 11);
+	fitData = -ones(length(shell_segments), 12);
     % Write headers in first row, and  copy as a string for file output
-	fits{1} = {'x segment pos,   y segment pos,   x shift,   y shift,   orientation,   semiminor axis,   PSF variance,   brightness,   aspectRatioMinusOne,   equatoriality,   residual'};
-	fitsHdr = ['x segment pos,   y segment pos,   x shift,   y shift,   orientation,   semiminor axis,   PSF variance,   brightness,   aspectRatioMinusOne,   equatoriality,   residual'];
+	fits{1} = {'x segment pos,   y segment pos,   x shift,   y shift,   orientation,   semiminor axis,   PSF variance,   brightness,   aspectRatioMinusOne,   equatoriality,   residual, sum_square_signal'};
+	fitsHdr = ['x segment pos,   y segment pos,   x shift,   y shift,   orientation,   semiminor axis,   PSF variance,   brightness,   aspectRatioMinusOne,   equatoriality,   residual, sum_square_signal'];
   %  fitsHdr = ['x segment pos,   y segment pos,   x shift,   y shift,   radius,   PSF sigma,   brightness,   residual'];
 	parfor i=1:length(shell_segments)
 		actual_image = shell_segments{i};
 		background = median(actual_image(actual_image < mean(actual_image(:))));
 		actual_image = double(actual_image - background);
+		sum_square_signal = sum( ((actual_image(:))).^2 );
 
 		bw_image = actual_image;
 		threshold = 35 - background;
@@ -79,10 +80,11 @@ for image_num = 1:length(input_files)
 		x_pos = centres(i, 1);
 		y_pos = centres(i, 2);
 		fits{i+1} = [x_pos, y_pos, x_centre_fit, y_centre_fit, 0, ...
-			           radius_fit, psf_sigma_fit.^2, height_fit, 0, 0, residual];
+			           radius_fit, psf_sigma_fit.^2, height_fit, 0, 0, ...
+								 residual, sum_square_signal];
 		fitData(i, :) = [x_pos, y_pos, x_centre_fit, y_centre_fit, 0, ...
                         radius_fit, psf_sigma_fit.^2, height_fit, ...
-												0, 0, residual];
+												0, 0, residual, sum_square_signal];
 	end
 
 	% Fitted segments
