@@ -2,20 +2,26 @@
 
 MATLAB software for ellipsoid localisation microscopy (ELM).
 
-Eric J. Rees and James D. Manton, University of Cambridge. 2016. CC-BY 4.0.
+Eric J. Rees and James D. Manton, University of Cambridge. 2016. License: CC-BY 4.0.
 
 The principle of ellipsoid localisation microscopy is presented in the following paper, together with measurements of some coat protein positions in *B. megaterium* and *B. subtilis*:
 
 [Julia Manetsberger, James D. Manton, Miklos J. Erdelyi, Henry Lin, David Rees, Graham Christie, Eric J. Rees. _Ellipsoid localisation microscopy infers the size and order of protein layers in Bacillus spore coats_. Biophysical Journal (2015).](http://dx.doi.org/10.1016/j.bpj.2015.09.023)
 
-This software package is a more advanced version of the method used above, and will be presented in more technical detail in an upcoming paper. Please cite these papers if you use this software to support a publication.
+This software package is a more advanced version of the method used above, and will be presented in more technical detail in an upcoming paper. Please cite these papers if you use this software for a publication.
 
 >- The fluorescent shell analysis repository also includes some preliminary code for a similar analysis of cylindrical fluorescent shells
 
 ## 1. Background
-ELM is an image analysis tool designed to measure the position of fluorescent fusion proteins in bacteria coats. Analogous fluorescent shell structures can also be measured.
+ELM is an image analysis tool designed to estimate the location of fluorescent fusion proteins in bacteria coats.
+Analogous fluorescent shell structures (where 'shell' just means a thin fluorescent layer around a spheroidal specimen) can also be measured.
 
-ELM very precisely infers the size of fluorescent shell structures, such as bacteria spores that incorporate a fluorescent fusion protein in the coat, from fluorescence image data which can be captured on a traditional fluorescence microscope. The ELM  method consists of segmentation of individual spore images (which must be sparse) followed by fitting an equation or a model to each image of a spore. For spherical shells, the radius can be inferred with a precision better than about 10 nm, and for ellipsoidal shells the semiaxis lengths can be inferred with similar precision. (The precision depends on the brightness and uniformity of the shells.) This makes it possible to identify information such as the position of each protein in a multi-layered coat, with a precision much better than the diffraction-limited resolution of an optical microscope.
+ELM very precisely infers the size (i.e. radius, or axis lengths) of fluorescent shell structures with certain geometries (e.g. spherical, ellipsoidal), by analysing fluorescence image data which can be captured on a traditional fluorescence microscope.
+The model structures provide good approximations of the way that some GFP-fusion proteins are incorporated into the multi-layered coats of bacterial spores.
+The ELM  method consists of segmentation of individual spore images (which must be well-separated from each other) followed by fitting an equation or a model to each image of a spore.
+For spherical shells, the radius can be inferred with a precision better than about 10 nm, and for ellipsoidal shells the semiaxis lengths can be inferred with similar precision.
+(The precision depends on the brightness and uniformity of the shells.)
+This makes it possible to identify information such as the position of each protein in a multi-layered coat, with a precision much better than the diffraction-limited resolution of an optical microscope.
 
 
 
@@ -75,19 +81,64 @@ The ELM GUI will try to analyse every file in a selected folder. It will save it
  >- the cylindrical model is implemented in the fluorescent shell analysis repository. It will be incorporated into the ELM GUI in a slightly different way, and should not be selected in the current version.
 
  6. Click the ```Process``` button. The software will then try to process all the image data and save the results.
-  * This should take a few seconds for the spherical model with its sample data, or a few minutes for the ellipsoidal model with its sample data. The waitbair will update every time the program moves on to a new file.
+  * This should take a few seconds for the spherical model with its sample data, or a few minutes for the ellipsoidal model with its sample data. The waitbar will update every time the program moves on to a new file.
   * Large folders of ellipsoidal spore images are best processed overnight.
 
  7. For each input file, the GUI will save four images to the output folder, as well as an (excel-readable) ```.CSV``` file with numerical results, and a ```.MAT``` file of Matlab-readable results. These output files will start with the same name as the corresponding input file.
 
-__How to access the numerical results__
+## 6. How to read and interpret the numerical results of the ELM software
 
-It is probably simplest to read the results by opening the ```.CSV``` results file in Excel or some other spreadsheet.
+The ELM software saves both a spreadsheet (```filename_params.CSV```) and a Matlab file (```filename_params.mat```) for each input file (```filename.tif```).
+It also saves several image file showing the raw, segmented, fitted, and reconstructed images for each input file.
 
-* Note the ```radius``` and ```semiminor_axis```lengths are given in pixel widths, and need to be multiplied through by the pixel width to give physical distances.
+### CSV (spreadheet) data
+The simplest way to review the numerical results is to open the ```.CSV``` results file in Excel or some other spreadsheet.
+The top row of the spreadsheet gives the parameter names saved by the ELM software, and each row of numberical data underneath gives the inferred values for one candidate spore.
+
+### The saved parameters are as follows
+
+Columns 1 and 2.
+```x segment pos``` and	   ```y segment pos``` are the rough XY-coordinates of the spore centre, estimated by the segmentation step of the image analysis. Units are pixel widths.
+
+Columns 3 and 4.
+```x shift``` and ```y shift``` are the XY-offsets to the exact centre position of the spore, obtained by the fitting step of the image analysis. Units are pixel widths.
+
+Column 5.
+```orientation``` is the azimuth orientation inferred by the ellipsoidal model for a prolate ellipsoid of revolution with its long axis lying in the XY plane. It is zero by default for a sphere.
+
+Column 6.
+```semiminor axis``` is the radius of a spherical shell, or the semi-minor axis of an ellipsoidal shell. Units are pixel widths.
+
+Column  7.
+```PSF variance``` describes the size of the point spread function (blur radius of the model microscope) fitted to the image data. Units are (pixel widths) squared.
+
+Column 8.
+``` brightness``` describes the fluorescence brightness of the spore. It is useful for comparing different spores.
+
+Column 9.
+```aspectRatioMinusOne``` is needed to handle ellipsoidal spores. If the long semiaxis length is ```b``` and the short semiaxis length is ```a``` then the parameter records ```(b/a) - 1```.  A value of zero is recorded for a sphere, naturally.
+
+Column 10.
+```equatorialty``` allows for ellipsoidal spores to have non-uniform fluorescence brightness per unit of their surface area, and to be brighter at the poles (if negative) or equator (if positive). The name 'polarity' was avoided in the programming, as that name may have various biological meanings.
+
+Column 11.
+``` residual``` is the sum of squared differences between the fitted pixel values and the actual values in the image data. (Actual values are after uniform background subtraction, and fitted values are fitted to the background-subtracted data.)
+
+Column 12.
+```sum_square_signal``` is the sum of squared pixel values (brightnesses) in the image data, after uniform background subtration.
+
+Note the ```radius``` and ```semiminor_axis```lengths are given in pixel widths, and need to be multiplied through by the pixel width to give physical distances.
 
 
-To read the data in Matlab, drop the ```.MAT``` files onto the Matlab console, then try the following:
+### MAT file data for Matlab
+
+To read the data in Matlab, drop the ```.mat``` file onto the Matlab console.
+The same data as in the spreadsheet is saved with the header names in the string ```fitsHdr``` and the numerical parameters for each spore stored as rows in ```fitData```.
+
+The Matlab script ```\rough\analyse_results.m``` reads all the ```MAT``` files in an output folder and can provide a summary of the combined results of all the spores in each image. (Refer to that script for details.)
+It can also perform a quality control step to exclude bad fits (usually by removing fits with extreme shell radii, or large blur radii) before summarising the accepted results.
+
+The image analysis results are also saved as a cell array in the ```MAT``` file, which can be read as follows (although EJR recommends avoiding cell arrays if possible):
 
     fit_headers = fits{1}   % Reads the headings of the data columns
     fit_data = cell2mat(fits(2:end)) % Reads the data
@@ -96,7 +147,8 @@ To read the data in Matlab, drop the ```.MAT``` files onto the Matlab console, t
     equivalent_radius = mean(fit_data(:,6).*(1+fit_data(:,9)).^(1/3))*74
 
 
-__Notes__
+
+## 7. Notes
 
 The ```Advanced``` button opens a panel in which some image analysis settings can be adjusted. This may be necessary for images with somewhat different scale or brightness to the sample data.  
 ![](doc/ELM_gui_advanced.png)
