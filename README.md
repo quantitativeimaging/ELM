@@ -188,6 +188,8 @@ The Matlab script ```\rough\analyse_results.m``` reads all the ```MAT``` files i
 (Refer to that script for details.)
 It can also perform a quality control step to exclude bad fits (usually by removing fits with extreme shell radii, or large blur radii) before summarising the accepted results.
 
+The script ```\rough\analyse_ELM_results.m``` does the same thing, but promts the user for parameters using a dialog window instead of using values in the script.
+
 The image analysis results are also saved as a cell array in the ```MAT``` file, which can be read as follows.
 (Note, however, that reading handling cell arrays can be rather cubmersome, and for most purposes it may be easier to read the results some other way.)
 
@@ -220,7 +222,7 @@ Try leaving this at the default value of one.
 This step uses the Matlab function ```roipoly()```.
 You should select regions in the middle of straight, cylindrical specimens and avoid selecting the ends.
 You must select regions with 4 corners: larger regions will be cut down to a quadrilateral with the first four corners.
-Refer to the ```>>doc roipoly``` instructions for full details on how to select a region of interest -- briefly, one can left-click on the first three corners of your region of interest, then double-click on the fourth to close the quadrilateral, then right-click on it and select 'create mask' from the menu. 
+Refer to the ```>>doc roipoly``` instructions for full details on how to select a region of interest -- briefly, one can left-click on the first three corners of your region of interest, then double-click on the fourth to close the quadrilateral, then right-click on it and select 'create mask' from the menu.
 
 5. The software will fit the cylindrical model to each specified segment.
 

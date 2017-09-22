@@ -32,6 +32,8 @@
 % 1.1 Specify image file to process
 [filename, pathname] = uigetfile({'*.tif'},'Select input image','../example_images/cylinders/');
 suppliedFileIn = [pathname, filename];
+% 1.1.1 Specify output folder
+folder_output_name = uigetdir('../example_output','Select folder for output');
 
 % 1.2 Preview file and get user to specify how many candidate areas they
 % will select (default is one).
@@ -100,3 +102,6 @@ end
 
 % 4. GENERATE A RECONSTRUCTED IMAGE
 sim_all_cylinders
+
+% 5. WRITE OVERLAY IMAGE INTO OUTPUT FOLDER
+imwrite(imOver./max(imOver(:)), [folder_output_name,'\',filename,'.png' ]);
