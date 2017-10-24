@@ -3,7 +3,7 @@
 %
 % Eric Rees 2015
 % Cylindrical fluorescent shell analysis
-% Quthor: Eric Rees, 2017
+% Author: Eric Rees, 2017
 % License: CC-BY 4.0
 
 % INSTRUCTIONS:

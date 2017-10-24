@@ -9,11 +9,10 @@
 %   2nd step: Fit model of thin shell to image data
 %             Display output
 %
-% Licence: LGPL Version 3+, http://www.gnu.org/licenses/lgpl.html 
+% Licence: CC-By 4+
+% Website: https://github.com/quantitativeimaging/ELM
 %
-% Website: http://laser.ceb.cam.ac.uk/research/our-software
-%
-% Please reference:   .......... ??????????? ADD REFERENCE
+% Please reference:   (see github reference)
 %
 %
 % Notes 

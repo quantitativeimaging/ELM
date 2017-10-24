@@ -7,7 +7,7 @@ flagGraph     = 2;  % Which fit graph to plot.
 radX   = 0.5;       % X-centre parameter adjustments to consider
 radY   = 0.5;
 radR   = 0.2*b0(3); % S.L.R. of ellipse
-radVar = 0.30*b0(4);
+radVar = 0.15*b0(4);
 radHt  = 0.1*b0(5);
 % radEl  = 0.1;       % ellipticity, meaning shape factor - 1, (c/a - 1)
 radPsi = 0.20;      % azimuthal orientation, radians
@@ -181,6 +181,23 @@ for lpIts = (numberIts+1): (2*numberIts)
     end
     radHt = radHt*shift;
     
+		% Check for blur radius (point spread function) improvement 
+    if(flagFixedBlur ==0) % Skip this is a fixed blur width is being used.
+    I     = image_cylWall_Monte(b0, X);
+    sumSq = sum((I - listI).^2);
+    IvarHi = image_cylWall_Monte(b0 + [0,0,0,radVar,0,0], X);
+    IvarLo = image_cylWall_Monte(b0 - [0,0,0,radVar,0,0], X);
+    ssVarH = sum((IvarHi - listI).^2);
+    ssVarL = sum((IvarLo - listI).^2);
+    if(ssVarH < sumSq && ssVarH < ssVarL)
+       b0(4) = b0(4) + radVar*0.75;
+    elseif(ssVarL < sumSq && ssVarL < ssVarH)
+       b0(4) = abs( b0(4) - radVar*0.75 ); % Don't allow -ve (but would be ok)
+    end
+    radVar = shift*radVar;
+    b0(4) = min([b0(4), maxVar]);
+    end
+		
     listParams(lpIts,:) = b0;
     
     if(flagGraph == 1)
@@ -212,6 +229,11 @@ for lpIts = (numberIts+1): (2*numberIts)
      ylabel('Pixel value', 'fontSize', 16)
      legend('Image data','Model fit')
      drawnow;
+		 if(lpIts ==(2*numberIts))
+			 assignin('base', 'cross_sec_posit', ySec);
+			 assignin('base', 'raw_pixel_value', listI);
+			 assignin('base', 'fit_pixel_value', I);
+		 end
     end
 end
 
