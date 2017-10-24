@@ -11,7 +11,8 @@ The principle of ellipsoid localisation microscopy is presented in the following
 This software package is a more developed and comprehensive version of the method used in the Manetsberger paper.
 The instructions and technical detail in this document accompany the paper:
 
-[James D. Manton, Yao Xiao, Robert D. Turner, Graham Christie, Eric J. Rees. _ELM: super-resolution analysis of fluorescent shells using widefield microscopy_.]
+[James D. Manton, Yao Xiao, Robert D. Turner, Simon J. Foster, Graham Christie, Eric J. Rees. _ELM: super-resolution analysis of wide-field
+images of fluorescent shell structures_.]
 
 Please cite these papers if you use this software for a publication.
 
@@ -184,11 +185,11 @@ The same data recorded in the spreadsheet is also saved in a more Matlab-compati
 To read the data in Matlab, drop the ```.mat``` file onto the Matlab console.
 A copy of the same data is saved with the header names in the string ```fitsHdr``` and the numerical parameters for each spore stored as rows in ```fitData```.
 
-The Matlab script ```\rough\analyse_results.m``` reads all the ```MAT``` files in an output folder and can provide a summary of the combined results of all the spores in each image.
+The Matlab script ```\example_analysis\analyse_results.m``` reads all the ```MAT``` files in an output folder and can provide a summary of the combined results of all the spores in each image.
 (Refer to that script for details.)
 It can also perform a quality control step to exclude bad fits (usually by removing fits with extreme shell radii, or large blur radii) before summarising the accepted results.
 
-The script ```\rough\analyse_ELM_results.m``` does the same thing, but promts the user for parameters using a dialog window instead of using values in the script.
+The script ```\example_analysis\analyse_ELM_results.m``` does the same thing, but promts the user for parameters using a dialog window instead of using values in the script.
 
 The image analysis results are also saved as a cell array in the ```MAT``` file, which can be read as follows.
 (Note, however, that reading handling cell arrays can be rather cubmersome, and for most purposes it may be easier to read the results some other way.)
