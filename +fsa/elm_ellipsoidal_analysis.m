@@ -1,5 +1,7 @@
 function elm_ellipsoidal_analysis(input_dir, output_dir, pixel_size, hough_low, hough_high, segmentation, border, seed, fluorophores, hough_sensitivity)
 
+tic; % Start timing the analysis
+
 % Parameters for shell finding
 radius_lower = hough_low;
 radius_upper = hough_high;
@@ -103,7 +105,7 @@ for image_num = 1:length(input_files)
 		equatoriality = -0.2;
 
 		% Fit shell to spore segment
-		[x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, residual] = fsa.fit_ellipsoid(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, actual_image);
+		[x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, residual] = fsa.fit_ellipsoid(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, actual_image,fluorophores);
         if(eccentricity<0) 
 					  % 0: If axis lengths are flipped, and 90 deg rot, and 
             % 1: Need to rename 'eccentricity' to 'aspectRatioMinusOne' or
@@ -181,5 +183,7 @@ for image_num = 1:length(input_files)
 	waitbar(image_num / length(input_files));
 end
 close(progress)
+
+toc; % End timing the analysis
 
 end

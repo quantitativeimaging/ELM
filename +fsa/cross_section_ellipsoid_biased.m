@@ -1,10 +1,12 @@
-function I = cross_section_ellipsoid_biased(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, X, varargin)
+function I = cross_section_ellipsoid_biased(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, X, fluorophores, vargin)
 
 if nargin > 9
-	num_points = varargin{1};
+	num_points = uint16(fluorophores);
 else
 	num_points = 3000;
 end
+
+% num_points
 
 eccentricity = eccentricity + 1;
 phi = 2 * pi * rand(num_points, 1);

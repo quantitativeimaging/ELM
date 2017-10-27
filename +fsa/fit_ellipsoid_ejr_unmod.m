@@ -1,4 +1,4 @@
-function [x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, residual] = fit_ellipsoid_ejr_unmod(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, actual_image, ~)
+function [x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, residual] = fit_ellipsoid_ejr_unmod(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, actual_image, steps, fluorophores,~)
 
 maxVar        = 12; % Prevent PSF width getting stuck at high values.
 flagFixedBlur = 0;  % Or set to 1 to disallow PSF width from varying.
@@ -36,16 +36,16 @@ listParams = zeros(numberIts * 2, 8);
 for lpIts = 1:numberIts
     % I     = image_biasEl_Monte(b0, X);
 		b1 = [b0(1), b0(2), b0(7), b0(3), b0(4), b0(5), b0(6), b0(8)];
-		I = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		I = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
     sumSq = sum((I - listI).^2);       % Quantifies misfit at initial guess
 
     % Check for sphere radius improvement
 		b0mod = b0 + [0,0,radR,0,0,0,0,0];
 		b1 = [b0mod(1), b0mod(2), b0mod(7), b0mod(3), b0mod(4), b0mod(5), b0mod(6), b0mod(8)];
-		IradHi = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		IradHi = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
     b0mod = b0 - [0,0,radR,0,0,0,0,0];
 		b1 = [b0mod(1), b0mod(2), b0mod(7), b0mod(3), b0mod(4), b0mod(5), b0mod(6), b0mod(8)];
-		IradLo = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		IradLo = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
     ssRadH = sum((IradHi - listI).^2);
     ssRadL = sum((IradLo - listI).^2);
     if(ssRadH < sumSq && ssRadH < ssRadL)
@@ -58,14 +58,14 @@ for lpIts = 1:numberIts
     % Check for blur radius (point spread function) improvement
     if(flagFixedBlur ==0) % Skip this is a fixed blur width is being used.
 		b1 = [b0(1), b0(2), b0(7), b0(3), b0(4), b0(5), b0(6), b0(8)];
-		I = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		I = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
     sumSq = sum((I - listI).^2);
 		b0mod = b0 + [0,0,0,radVar,0,0,0,0];
 		b1 = [b0mod(1), b0mod(2), b0mod(7), b0mod(3), b0mod(4), b0mod(5), b0mod(6), b0mod(8)];
-		IvarHi = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		IvarHi = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
 		b0mod = b0 - [0,0,0,radVar,0,0,0,0];
 		b1 = [b0mod(1), b0mod(2), b0mod(7), b0mod(3), b0mod(4), b0mod(5), b0mod(6), b0mod(8)];
-		IvarLo = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		IvarLo = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
     ssVarH = sum((IvarHi - listI).^2);
     ssVarL = sum((IvarLo - listI).^2);
     if(ssVarH < sumSq && ssVarH < ssVarL)
@@ -79,14 +79,14 @@ for lpIts = 1:numberIts
 
     % Check for brightness (signal height) improvement
 		b1 = [b0(1), b0(2), b0(7), b0(3), b0(4), b0(5), b0(6), b0(8)];
-		I = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		I = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
     sumSq = sum((I - listI).^2);
 		b0mod = b0 + [0,0,0,0,radHt,0,0,0];
 		b1 = [b0mod(1), b0mod(2), b0mod(7), b0mod(3), b0mod(4), b0mod(5), b0mod(6), b0mod(8)];
-		IhtHi = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		IhtHi = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
 		b0mod = b0 - [0,0,0,0,radHt,0,0,0];
 		b1 = [b0mod(1), b0mod(2), b0mod(7), b0mod(3), b0mod(4), b0mod(5), b0mod(6), b0mod(8)];
-		IhtLo = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		IhtLo = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
     ssHtH = sum((IhtHi - listI).^2);
     ssHtL = sum((IhtLo - listI).^2);
     if(ssHtH < sumSq && ssHtH < ssHtL)
@@ -98,14 +98,14 @@ for lpIts = 1:numberIts
 
     % Check for centre co-ordinate improvement (X-direction)
 		b1 = [b0(1), b0(2), b0(7), b0(3), b0(4), b0(5), b0(6), b0(8)];
-		I = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		I = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
     sumSq = sum((I - listI).^2);
 		b0mod = b0 + [radX,0,0,0,0,0,0,0];
 		b1 = [b0mod(1), b0mod(2), b0mod(7), b0mod(3), b0mod(4), b0mod(5), b0mod(6), b0mod(8)];
-		IxcHi = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		IxcHi = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
 		b0mod = b0 - [radX,0,0,0,0,0,0,0];
 		b1 = [b0mod(1), b0mod(2), b0mod(7), b0mod(3), b0mod(4), b0mod(5), b0mod(6), b0mod(8)];
-		IxcLo = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		IxcLo = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
     ssXcH = sum((IxcHi - listI).^2);
     ssXcL = sum((IxcLo - listI).^2);
     if(ssXcH < sumSq && ssXcH < ssXcL)
@@ -117,14 +117,14 @@ for lpIts = 1:numberIts
 
     % Check for centre co-ordinate improvement (Y-direction)
 		b1 = [b0(1), b0(2), b0(7), b0(3), b0(4), b0(5), b0(6), b0(8)];
-		I = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		I = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
 		sumSq = sum((I - listI).^2);
 		b0mod = b0 + [0,radY,0,0,0,0,0,0];
 		b1 = [b0mod(1), b0mod(2), b0mod(7), b0mod(3), b0mod(4), b0mod(5), b0mod(6), b0mod(8)];
-		IycHi = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		IycHi = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
 		b0mod = b0 - [0,radY,0,0,0,0,0,0];
 		b1 = [b0mod(1), b0mod(2), b0mod(7), b0mod(3), b0mod(4), b0mod(5), b0mod(6), b0mod(8)];
-		IycLo = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		IycLo = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
     ssYcH = sum((IycHi - listI).^2);
     ssYcL = sum((IycLo - listI).^2);
     if(ssYcH < sumSq && ssYcH < ssYcL)
@@ -136,14 +136,14 @@ for lpIts = 1:numberIts
 
     % Check for azimuthal angle improvement
 		b1 = [b0(1), b0(2), b0(7), b0(3), b0(4), b0(5), b0(6), b0(8)];
-		I = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		I = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
     sumSq = sum((I - listI).^2);
 		b0mod = b0 + [0,0,0,0,0,0,radPsi,0];
 		b1 = [b0mod(1), b0mod(2), b0mod(7), b0mod(3), b0mod(4), b0mod(5), b0mod(6), b0mod(8)];
-		IazHi = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		IazHi = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
 		b0mod = b0 - [0,0,0,0,0,0,radPsi,0];
 		b1 = [b0mod(1), b0mod(2), b0mod(7), b0mod(3), b0mod(4), b0mod(5), b0mod(6), b0mod(8)];
-		IazLo = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		IazLo = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
     ssAzH = sum((IazHi - listI).^2);
     ssAzL = sum((IazLo - listI).^2);
     if(ssAzH < sumSq && ssAzH < ssAzL)
@@ -155,14 +155,14 @@ for lpIts = 1:numberIts
 
     % Check for ellipticity improvement
 		b1 = [b0(1), b0(2), b0(7), b0(3), b0(4), b0(5), b0(6), b0(8)];
-		I = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		I = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
     sumSq = sum((I - listI).^2);
 		b0mod = b0 + [0,0,0,0,0,radEl,0,0];
 		b1 = [b0mod(1), b0mod(2), b0mod(7), b0mod(3), b0mod(4), b0mod(5), b0mod(6), b0mod(8)];
-		IelHi = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		IelHi = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
 		b0mod = b0 - [0,0,0,0,0,radEl,0,0];
 		b1 = [b0mod(1), b0mod(2), b0mod(7), b0mod(3), b0mod(4), b0mod(5), b0mod(6), b0mod(8)];
-		IelLo = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+		IelLo = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
     ssElH = sum((IelHi - listI).^2);
     ssElL = sum((IelLo - listI).^2);
     if(ssElH < sumSq && ssElH < ssElL)
@@ -178,16 +178,16 @@ end
 % Further iterature to refine radius.
 for lpIts = (numberIts+1): (2*numberIts)
 	b1 = [b0(1), b0(2), b0(7), b0(3), b0(4), b0(5), b0(6), b0(8)];
-	I = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+	I = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
 	sumSq = sum((I - listI).^2);       % Quantifies misfit at initial guess
 
 	% Check for sphere radius improvement
 	b0mod = b0 + [0,0,radR,0,0,0,0,0];
 	b1 = [b0mod(1), b0mod(2), b0mod(7), b0mod(3), b0mod(4), b0mod(5), b0mod(6), b0mod(8)];
-	IradHi = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+	IradHi = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
 	b0mod = b0 - [0,0,radR,0,0,0,0,0];
 	b1 = [b0mod(1), b0mod(2), b0mod(7), b0mod(3), b0mod(4), b0mod(5), b0mod(6), b0mod(8)];
-	IradLo = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+	IradLo = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
 	ssRadH = sum((IradHi - listI).^2);
 	ssRadL = sum((IradLo - listI).^2);
 	if(ssRadH < sumSq && ssRadH < ssRadL)
@@ -200,16 +200,16 @@ for lpIts = (numberIts+1): (2*numberIts)
 
 
 	b1 = [b0(1), b0(2), b0(7), b0(3), b0(4), b0(5), b0(6), b0(8)];
-	I = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+	I = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
 	sumSq = sum((I - listI).^2);       % Quantifies misfit at initial guess
 
 	% Check for equatoriality improvement
 	b0mod = b0 + [0,0,0,0,0,0,0,radEq];
 	b1 = [b0mod(1), b0mod(2), b0mod(7), b0mod(3), b0mod(4), b0mod(5), b0mod(6), b0mod(8)];
-	IeqHi = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+	IeqHi = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
 	b0mod = b0 - [0,0,0,0,0,0,0,radEq];
 	b1 = [b0mod(1), b0mod(2), b0mod(7), b0mod(3), b0mod(4), b0mod(5), b0mod(6), b0mod(8)];
-	IeqLo = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+	IeqLo = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
 	ssEqH = sum((IeqHi - listI).^2);
 	ssEqL = sum((IeqLo - listI).^2);
 	if(ssEqH < sumSq && ssEqH < ssEqL)
@@ -223,14 +223,14 @@ for lpIts = (numberIts+1): (2*numberIts)
 
 	% Check for brightness (signal height) improvement
 	b1 = [b0(1), b0(2), b0(7), b0(3), b0(4), b0(5), b0(6), b0(8)];
-	I = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+	I = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
 	sumSq = sum((I - listI).^2);
 	b0mod = b0 + [0,0,0,0,radHt,0,0,0];
 	b1 = [b0mod(1), b0mod(2), b0mod(7), b0mod(3), b0mod(4), b0mod(5), b0mod(6), b0mod(8)];
-	IhtHi = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+	IhtHi = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
 	b0mod = b0 - [0,0,0,0,radHt,0,0,0];
 	b1 = [b0mod(1), b0mod(2), b0mod(7), b0mod(3), b0mod(4), b0mod(5), b0mod(6), b0mod(8)];
-	IhtLo = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X);
+	IhtLo = fsa.cross_section_ellipsoid_biased(b1(1), b1(2), b1(3), b1(4), b1(5), b1(6), b1(7), b1(8), X, fluorophores);
 	ssHtH = sum((IhtHi - listI).^2);
 	ssHtL = sum((IhtLo - listI).^2);
 	if(ssHtH < sumSq && ssHtH < ssHtL)
