@@ -46,9 +46,14 @@ number_of_results = length(listMats);
 listMeanEquivRad     = -ones(number_of_results, 1);  
 listMedianVar        = -ones(number_of_results, 1);
 listCroppedEquivRads = -ones(number_of_results, 1);
+listCroppedEquivRadsStdev = -ones(number_of_results, 1);
 listQualityCheckFirst = zeros(number_of_results, 1);
 listNumberAccepted   = zeros(number_of_results, 1);
+listNumberRejected   = zeros(number_of_results, 1);
 listCroppedPercentResidual =zeros(number_of_results, 1);
+
+output_list_accepted_radii_nm = [];
+% output_list_filenames        = [];
 
 for lp = 1:number_of_results
 	lp
@@ -73,8 +78,10 @@ qualityCheck( equiv_rads > max_radius ) = 0; % Fails check if fit is too large
 
 
   % figure(2)
-	listCroppedEquivRads(lp) = mean(equiv_rads(qualityCheck==1));
+	listCroppedEquivRads(lp)      = mean(equiv_rads(qualityCheck==1));
+	listCroppedEquivRadsStdev(lp) = std(equiv_rads(qualityCheck==1));
 	listNumberAccepted(lp) = sum(qualityCheck);
+	listNumberRejected(lp) = size(fitData,1) - listNumberAccepted(lp);
 	  
 	figure(6)	
 	scatter(equiv_rads, fitData(:,7), 'r')
@@ -94,6 +101,8 @@ qualityCheck( equiv_rads > max_radius ) = 0; % Fails check if fit is too large
 		listCroppedPercentResidual(lp) = mean(percentResidual(qualityCheck==1));
 	end
 
+	accepted_radii = equiv_rads(qualityCheck==1);
+	output_list_accepted_radii_nm = [output_list_accepted_radii_nm; accepted_radii];
 	%pause
 end
 
@@ -105,3 +114,19 @@ set(gca, 'XTick', 1:length(cellNames), 'XTickLabel', cellNames);
 ylabel('equivalent radius / nm')
 xlabel('Protein')
 set(gca, 'fontSize', 14);
+
+% Write all the accepted radii into a CSV file in a big list
+% csvwrite(fullfile(myFolder, ['Z_all_accepted_radii.csv']), output_list_accepted_radii_nm);
+fid =fopen(fullfile(myFolder, ['Z_all_accepted_radii.csv']),'wt');
+  myHeader = 'Accepted radius / nm';
+  fprintf(fid, [myHeader '\n']); % Write headers into what will be a csv
+fclose(fid);
+dlmwrite(fullfile(myFolder, ['Z_all_accepted_radii.csv']), output_list_accepted_radii_nm, '-append' )
+
+% csvwrite(fullfile(myFolder, ['Z_summary_of_tiffs.csv']), 1);
+fid =fopen(fullfile(myFolder, ['Z_summary.csv']),'wt');
+  myHeader = 'mean accepted radius / nm, Standard deviation of accepted radius, number accepted, number rejected, percent residual';
+  fprintf(fid, [myHeader '\n']); % Write headers into what will be a csv
+fclose(fid);
+  output_data = [listCroppedEquivRads,listCroppedEquivRadsStdev, listNumberAccepted, listNumberRejected, listCroppedPercentResidual];
+dlmwrite(fullfile(myFolder, ['Z_summary.csv'] ), output_data, '-append' )
