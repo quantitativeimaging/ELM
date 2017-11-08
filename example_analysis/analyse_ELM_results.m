@@ -5,19 +5,51 @@
 % 1. The ELM software produces a folder with pictures and a MAT file for each
 % input image file.
 % 2. This script reads each MAT file in the target folder. Fitted spore
-% candidates that pass quality control are used to get a results.
-% 3. The results for all the files can then be copy-pasted to Excel
-% 4. A hard-coded pixel width is set in this script (default: 74 nm)
+% candidates that pass a quality control check are used to report results.
+% 3. The results for all the files are saved as CSVs (openable in Excel)
+% 4. Pixel width is requested so results are written in nm. Default: 74 nm
 
+% HOW TO USE THIS SCRIPT
+% 1. First, run the ELM software for spherical or ellipsoidal analysis
+% 2. That software will produce a results folder
+% 3. Run this script and select the results folder using the dialog window
+% 4. Use the dialog box to specify quality control parameters for
+%    accepting / rejecting the results fiited to each image candidate, 
+%    and also to specify the width (in nanometers, nm) of the pixels.
+% 
 % QUALITY CONTROL CRITERIA
-%  Shell not implausibly large (e.g. > 700 nm radius)
-%  Shell not implausibly small (e.g. < 300 nm radius)
-%  Shell not too blurred (which often means > 1 spore, or a bad fit).
+% The following quality control criteria must all be successful for the
+% parameters fitted to a candidate image to be accepted:
+% 1.  Shell not implausibly large (e.g. > 700 nm radius)
+% 2.  Shell not implausibly small (e.g. < 300 nm radius)
+% 3.  Shell not too blurred (which often means > 1 spore, or a bad fit).
+% 4.  Blur 'radius' limit thresholds the variance of the fitted Gaussian 
+%    P.S.F. so a limit of 10 means sqrt(10) pixels of standard deviation
+%    which at 74 nm/pixel is 234 nm (i.e. quite blurred, in practice).
 %
-% OUTPUT - written to base matlab workspace
+% In practice, the size-limit quality control step should be used to remove
+% obvious outliers, and most of the quality control work is done by
+% checking that the fitted blur radius is below the threshold specified
+% here
+%
+% OUTPUT - the following key data is produced in the base matlab workspace
 %  'listFilenames'              the first 16 characters of filename if poss
 %  'listCroppedEquivRads'       the mean radius after quality control
 %  'listCroppedPercentResidual' characterises error of the fit
+%
+% OUTPUT - the following CSV spreadsheets are added to the folder 
+% containing the results from the accepted candidate images
+%
+%  'Z_all_accepted_radii.csv' - a single column containing all the accepted
+%   radius values from all candidate images in a folder. Useful for
+%   producing a histogram of spore sizes with large amounts of data.
+%
+%  'Z_summary.csv' - a spreadsheet containing the mean radius and the
+%  standard deviation of radii accepted candidates in each image file, 
+%  together with the number of accepted and rejected candidates and the 
+%  error of the fitting process for the accepted images, expressed as a 
+%  percentage of the image data. In practice, errors smaller
+%  than about 5% seem to be 'of good quality' in our experiments. 
 
 % 1. INPUT
 % Specify folder containing MAT files of ELM results to process
@@ -25,7 +57,7 @@ myFolder = uigetdir('../example_output','Select folder for analysis');
 
 % 1.1 Get pixel width and quality control criteria
 prompt = {'Pixel width in nm (e.g. 74)', ...
-	        'Blur radius limit (e.g. 10)', ...
+	        'Blur radius limit (as variance, e.g. 10)', ...
 	        'Minimum radius in nm', ...
 					'Maximum radius in nm'};
 dlg_title = 'Analysis settings';
@@ -39,7 +71,7 @@ min_radius     = str2num(answer{3});
 max_radius     = str2num(answer{4});
 
 
-listMats = dir([myFolder, '\*.mat']); % in current directory
+listMats = dir([myFolder, '\*.mat']); % in the chosen directory
 
 number_of_results = length(listMats);
 
@@ -52,9 +84,11 @@ listNumberAccepted   = zeros(number_of_results, 1);
 listNumberRejected   = zeros(number_of_results, 1);
 listCroppedPercentResidual =zeros(number_of_results, 1);
 
-output_list_accepted_radii_nm = [];
-% output_list_filenames        = [];
+output_list_accepted_radii_nm = []; % To store a long list of results
 
+% 2. ANALYSIS
+% Pull out the fitted parameters which pass quality control
+% in the results for each input frame of image data.
 for lp = 1:number_of_results
 	lp
 	load([myFolder,'\', listMats(lp).name]);
@@ -68,7 +102,7 @@ for lp = 1:number_of_results
 		listFilenames(lp,1:16) = filename_stem;
 	else
 		filename_stem = 'sample';
-		listFilenames(lp,1) = 'a';
+		listFilenames(lp,1:6) = 'sample';
 	end
 
 qualityCheck = ones(size(fitData,1), 1);
@@ -106,6 +140,8 @@ qualityCheck( equiv_rads > max_radius ) = 0; % Fails check if fit is too large
 	%pause
 end
 
+% OUTPUT
+% Plot a graph and save results in CSV spreadsheets
 figure(8)
 bar(listCroppedEquivRads)
 cellNames = cellstr(listFilenames(:,(1):end));
@@ -115,7 +151,7 @@ ylabel('equivalent radius / nm')
 xlabel('Protein')
 set(gca, 'fontSize', 14);
 
-% Write all the accepted radii into a CSV file in a big list
+% Write all the accepted radii into a CSV file in a long list
 % csvwrite(fullfile(myFolder, ['Z_all_accepted_radii.csv']), output_list_accepted_radii_nm);
 fid =fopen(fullfile(myFolder, ['Z_all_accepted_radii.csv']),'wt');
   myHeader = 'Accepted radius / nm';
@@ -123,10 +159,22 @@ fid =fopen(fullfile(myFolder, ['Z_all_accepted_radii.csv']),'wt');
 fclose(fid);
 dlmwrite(fullfile(myFolder, ['Z_all_accepted_radii.csv']), output_list_accepted_radii_nm, '-append' )
 
-% csvwrite(fullfile(myFolder, ['Z_summary_of_tiffs.csv']), 1);
+% Write a summary of the parameters fitted to accepted spores in each TIFF input file
+output_data = [listCroppedEquivRads,listCroppedEquivRadsStdev, listNumberAccepted, listNumberRejected, listCroppedPercentResidual*100];
+output_files  = struct2cell(listMats);
+output_filenames = output_files(1,:);
+output_filenames(:) = strrep(output_filenames(:), ',', ''); % Remove the commas which someone puts into their filenames (!)
+
+output_cell_array = cell(length(listMats), 6);
+  output_cell_array(:,1)   = output_filenames;
+	output_cell_array(:,2:6) = num2cell(output_data);
+
 fid =fopen(fullfile(myFolder, ['Z_summary.csv']),'wt');
-  myHeader = 'mean accepted radius / nm, Standard deviation of accepted radius, number accepted, number rejected, percent residual';
+  myHeader = 'filename, mean accepted radius / nm, Standard deviation of accepted radius, number accepted, number rejected, percent residual';
   fprintf(fid, [myHeader '\n']); % Write headers into what will be a csv
+  formatSpec = '%s, %d, %d, %d, %d, %d\n';
+  [nrows,ncols] = size(output_cell_array);
+  for row = 1:nrows
+    fprintf(fid,formatSpec,output_cell_array{row,:});
+  end
 fclose(fid);
-  output_data = [listCroppedEquivRads,listCroppedEquivRadsStdev, listNumberAccepted, listNumberRejected, listCroppedPercentResidual];
-dlmwrite(fullfile(myFolder, ['Z_summary.csv'] ), output_data, '-append' )
