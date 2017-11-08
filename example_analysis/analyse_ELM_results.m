@@ -137,7 +137,9 @@ qualityCheck( equiv_rads > max_radius ) = 0; % Fails check if fit is too large
 
 	accepted_radii = equiv_rads(qualityCheck==1);
 	output_list_accepted_radii_nm = [output_list_accepted_radii_nm; accepted_radii];
-	%pause
+	
+	tile_assessed_segments(shell_segments, qualityCheck); % Show accepted fits
+	% pause
 end
 
 % OUTPUT
