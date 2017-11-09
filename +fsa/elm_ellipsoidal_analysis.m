@@ -135,7 +135,7 @@ for image_num = 1:length(input_files)
 	fit_segments = cell(length(shell_segments));
 	for i=1:length(fit_segments)
 		fit = fits{i+1};
-		fit_image = fsa.image_ellipsoid_biased(fit(3), fit(4), fit(5), fit(6), fit(7), fit(8), fit(9), fit(10), shell_segments{i});
+		fit_image = fsa.image_ellipsoid_biased(fit(3), fit(4), fit(5), fit(6), fit(7), fit(8), fit(9), fit(10), shell_segments{i}, fluorophores);
 		fit_segments{i} = fit_image;
 	end
 	fit_tiles = fsa.tile_segments(fit_segments);
@@ -150,7 +150,7 @@ for image_num = 1:length(input_files)
 	sr_segments = cell(length(shell_segments));
 	for i=1:length(sr_segments)
 		fit = fits{i+1};
-		sr_image = fsa.image_ellipsoid_biased(fit(3), fit(4), fit(5), fit(6), 1, fit(8), fit(9), fit(10), shell_segments{i});
+		sr_image = fsa.image_ellipsoid_biased(fit(3), fit(4), fit(5), fit(6), 1, fit(8), fit(9), fit(10), shell_segments{i},fluorophores);
 		sr_segments{i} = sr_image;
 	end
 	sr_tiles = fsa.tile_segments(sr_segments);
