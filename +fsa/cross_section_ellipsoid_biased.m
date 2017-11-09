@@ -1,4 +1,25 @@
 function I = cross_section_ellipsoid_biased(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, X, fluorophores, vargin)
+% CROSS_SECTION_ELLIPSOID_BIASED Return radial intensities of image of a thin biased ellipsoidal shell
+%
+%   I = CROSS_SECTION_ELLIPSOID_BIASED(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, X, fluorophores, vargin)
+%
+%   Input:
+%     x_shift        - x coordinate of shell centre
+%     y_shift        - y coordinate of shell centre
+%     orientation    - angle of major axis
+%     semiminor_axis - length of semi-minor axis
+%     psf_variance   - variance of Gaussian point spread function
+%     height         - height of image intensity
+%     eccentricity   - eccentricity of ellipsoid
+%     equatoriality  - degree of bias towards the equator
+%     X              - array of (x, y) coordinates
+%     fluorophores   - number of fluorophores to simulate
+%
+%   Output:
+%     I - vector of radial image intensities
+%
+%   See also CROSS_SECTION_SPHERE_THIN.
+
 
 if nargin > 9
 	num_points = uint16(fluorophores);

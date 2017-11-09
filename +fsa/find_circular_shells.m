@@ -1,4 +1,24 @@
 function [centres, radii, metric] = find_circular_shells(image_data, radius_lower, radius_upper, segment_half_size, edge_border, hough_sensitivity, ShowPlot);
+% FIND_CIRCULAR_SHELLS Find candidate circular shells using a Hough transform
+%
+%   [centres, radii, metric] = FIND_CIRCULAR_SHELLS(image_data, radius_lower, radius_upper, segment_half_size, edge_border, hough_sensitivity, ShowPlot)
+%
+%   Input:
+%     image_data        - image to search
+%     radius_lower      - lower bound for radius
+%     radius_upper      - upper bound for radius
+%     segment_half_size - size of the segmented image
+%     edge_border       - size of image border to exclude from search
+%     hough_sensitivity - sensitivity of Hough transform search
+%     ShowPlot          - flag indicating that a plot of found segments should be shown
+%
+%   Output:
+%     centres - centre locations of segments
+%     radii   - radii of shells
+%     metric  - magnitude of accumulator array peak associated with each circle
+%
+%   See also IMFINDCIRCLES.
+
 
 flagExcludeAll = 1; % If 1, exclude collisions strictly to counter clumps
 
@@ -24,7 +44,7 @@ if(size(A, 2) > 1)
 		dists = sqrt((centres(:,1)-centres(lp,1)).^2 + (centres(:,2)-centres(lp,2)).^2 );
 		dists(lp) = collisionRadius + 100; % Don't exlcude the candidate due to itself
 		minDist = min(dists);
-		
+
 		if(flagExcludeAll == 1) % To exlude all candidates in clumps of 3+
 		  indexOfClumpers = find((dists < collisionRadius));
 			if( length(indexOfClumpers) > 1 ) % group of 2 = 1 clash = ellipsoid
@@ -34,7 +54,7 @@ if(size(A, 2) > 1)
 				metric(indexOfClumpers) = [];
 			end
 		end
-		
+
 		if(minDist<collisionRadius) % Exclude candidate if one other is nearby
 			centres(lp,:) = [];
 			radii(lp) = [];
@@ -57,7 +77,7 @@ if (ShowPlot)
 		x = centres(i, 1) - segment_half_size;
 		y = centres(i, 2) - segment_half_size;
 		rectangle('Position', [x, y, segment_half_size*2, segment_half_size*2], 'EdgeColor', 'r')
-		dx = 5; 
+		dx = 5;
     dy = -1; % displacement so the text does not overlay the data points
     text(centres(i,1)+dx, centres(i,2)+dy, int2str(i), 'color','g','fontSize',12);
 	end

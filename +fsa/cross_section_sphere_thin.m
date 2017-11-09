@@ -1,19 +1,24 @@
-function I = cross_section_sphere_thin(x_centre, y_centre, radius, psf_sigma, height, X)
-% CROSS_SECTION_SPHERE_THIN - Return radial intensities of image of a thin spherical shell
+function I = cross_section_sphere_thin(x_shift, y_shift, radius, psf_sigma, height, X)
+% CROSS_SECTION_SPHERE_THIN Return radial intensities of image of a thin spherical shell
 %
-% Input:
-% 	x_centre  - x coordinate of shell centre.
-% 	y_centre  - y coordinate of shell centre.
-% 	radius    - Shell radius.
-% 	psf_sigma - Standard deviation of Gaussian point spread function.
-% 	height    - Height of image intensity.
-% 	X         - Array of (x, y) coordinates.
+%   I = CROSS_SECTION_SPHERE_THIN(x_shift, y_shift, radius, psf_sigma, height, X)
 %
-% Output:
-% 	I - Vector of radial image intensities.
+%   Input:
+%     x_shift   - x coordinate of shell centre
+%     y_shift   - y coordinate of shell centre
+%     radius    - shell radius
+%     psf_sigma - standard deviation of Gaussian point spread function
+%     height    - height of image intensity
+%     X         - array of (x, y) coordinates
+%
+%   Output:
+%     I - vector of radial image intensities
+%
+%   See also CROSS_SECTION_ELLIPSOID_BIASED.
+
 
 % Radial position
-r = sqrt((X(:, 1) - x_centre).^2 + (X(:, 2) - y_centre).^2);
+r = sqrt((X(:, 1) - x_shift).^2 + (X(:, 2) - y_shift).^2);
 
 psf_variance = psf_sigma^2;
 
