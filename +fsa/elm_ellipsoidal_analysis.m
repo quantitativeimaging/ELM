@@ -96,10 +96,10 @@ for image_num = 1:length(input_files)
         
 		x_shift = centroid(1) - segment_half_size - 1;
 		y_shift = centroid(2) - segment_half_size - 1;
-		% orientation =  -1; % Arbitrary initial guess
+		% orientation =  1; % Use fixed, arbitrary initial guess of orientation
         
 		semiminor_axis = 6;
-		psf_variance = 8;
+		psf_variance = 6;
 		height = max(actual_image(:));
 		eccentricity = 0.2;
 		equatoriality = -0.2;

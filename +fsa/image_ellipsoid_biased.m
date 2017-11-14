@@ -36,7 +36,7 @@ if nargin > 9
 	num_points = varargin{1};
 	image_vector = fsa.cross_section_ellipsoid_biased(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, X, num_points);
 else
-	image_vector = fsa.cross_section_ellipsoid_biased(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, X);
+	image_vector = fsa.cross_section_ellipsoid_biased(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, X, 3000);
 end
 
 imagemat = reshape(image_vector, size(imagemat));
