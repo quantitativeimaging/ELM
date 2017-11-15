@@ -64,7 +64,7 @@ setappdata(0, 'radius_low', '5');
 setappdata(0, 'radius_high', '15');
 setappdata(0, 'segmentation', '13');
 setappdata(0, 'border', '7');
-setappdata(0, 'seed', '7');
+setappdata(0, 'seed', '1066');
 setappdata(0, 'fluorophores', '3000');
 setappdata(0, 'hough_sensitivity', '0.85');
 

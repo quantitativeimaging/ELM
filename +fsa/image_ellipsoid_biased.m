@@ -1,4 +1,4 @@
-function I = image_ellipsoid_biased(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, imagemat, varargin)
+function I = image_ellipsoid_biased(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, imagemat, fluorophores, seed)
 	% IMAGE_ELLIPSOID_BIASED Return image of a thin biased ellipsoidal shell
 	%
 	%   I = IMAGE_ELLIPSOID_BIASED(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, imagemat, varargin)
@@ -13,6 +13,8 @@ function I = image_ellipsoid_biased(x_shift, y_shift, orientation, semiminor_axi
 	%     eccentricity   - eccentricity of ellipsoid
 	%     equatoriality  - degree of bias towards the equator
 	%     X              - matrix to fill with image
+	%     fluorophores   - number of fluorophores to simulate
+	%     seed           - seed for random number generator
 	%
 	%   Output:
 	%     I - image of ellipsoidal shell intensities
@@ -32,12 +34,7 @@ y = -(1:image_height) + image_centre_y;
 [x y] = meshgrid(x, y);
 X = [x(:) y(:)];
 
-if nargin > 9
-	num_points = varargin{1};
-	image_vector = fsa.cross_section_ellipsoid_biased(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, X, num_points);
-else
-	image_vector = fsa.cross_section_ellipsoid_biased(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, X, 3000);
-end
+image_vector = fsa.cross_section_ellipsoid_biased(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, X, fluorophores, seed);
 
 imagemat = reshape(image_vector, size(imagemat));
 I = imagemat;

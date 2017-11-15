@@ -1,4 +1,4 @@
-function [x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, aspect_ratio_minus_one, equatoriality, residual] = fit_ellipsoid(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, aspect_ratio_minus_one, equatoriality, actual_image, fluorophores)
+function [x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, aspect_ratio_minus_one, equatoriality, residual] = fit_ellipsoid(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, aspect_ratio_minus_one, equatoriality, actual_image, fluorophores, seed)
 
 image_width = size(actual_image, 2);
 image_height = size(actual_image, 1);
@@ -13,7 +13,7 @@ y = -(1:image_height) + image_centre_y;
 [x, y] = meshgrid(x, y);
 X = [x(:), y(:)];
 
-f = @(initial_params, X) fsa.cross_section_ellipsoid_biased(initial_params(1), initial_params(2), initial_params(3), initial_params(4), initial_params(5), initial_params(6), initial_params(7), initial_params(8), X, fluorophores);
+f = @(initial_params, X) fsa.cross_section_ellipsoid_biased(initial_params(1), initial_params(2), initial_params(3), initial_params(4), initial_params(5), initial_params(6), initial_params(7), initial_params(8), X, fluorophores, seed);
 initial_params = [x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, aspect_ratio_minus_one, equatoriality];
 opts = optimoptions('lsqcurvefit', 'Display', 'none', 'TolFun', 1e-10);
 upper_bounds = [5, 5, pi, 10, 10, max(actual_image(:)) * 2, 2.5, 0.75];
@@ -28,7 +28,7 @@ psf_variance = fit_params(5);
 height = fit_params(6);
 aspect_ratio_minus_one = fit_params(7);
 equatoriality = fit_params(8);
-fit = fsa.cross_section_ellipsoid_biased(fit_params(1), fit_params(2), fit_params(3), fit_params(4), fit_params(5), fit_params(6), fit_params(7), fit_params(8), X, fluorophores);
+fit = fsa.cross_section_ellipsoid_biased(fit_params(1), fit_params(2), fit_params(3), fit_params(4), fit_params(5), fit_params(6), fit_params(7), fit_params(8), X, fluorophores, seed);
 residual = sum((fit - listI).^2);
 
 end

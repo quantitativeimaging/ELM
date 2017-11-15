@@ -1,5 +1,7 @@
 function elm_spherical_analysis(input_dir, output_dir, hough_low, hough_high, segmentation, border, seed, fluorophores, hough_sensitivity)
 
+tic
+
 % Parameters for shell finding
 radius_lower = hough_low;
 radius_upper = hough_high;
@@ -133,5 +135,6 @@ for image_num = 1:length(input_files)
 end
 
 close(progress)
+toc
 
 end

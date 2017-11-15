@@ -8,8 +8,6 @@ radius_upper = hough_high;
 segment_half_size = segmentation;
 edge_border = border;
 
-rng(seed);
-
 % Set the following flag to 1 to see each segment as it is fitted
 SHOW_ALL_FITS = 0;
 
@@ -98,7 +96,7 @@ for image_num = 1:length(input_files)
 		equatoriality = -0.2;
 
 		% Fit shell to spore segment
-		[x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, residual] = fsa.fit_ellipsoid(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, actual_image,fluorophores);
+		[x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, residual] = fsa.fit_ellipsoid(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, actual_image, fluorophores, seed);
 		if (eccentricity < 0)
 			correct_semiminor_axis = semiminor_axis * (1 + eccentricity);
 			correct_semimajor_axis = semiminor_axis;
@@ -118,7 +116,7 @@ for image_num = 1:length(input_files)
 	fit_segments = cell(length(shell_segments));
 	for i=1:length(fit_segments)
 		fit = fits{i+1};
-		fit_image = fsa.image_ellipsoid_biased(fit(3), fit(4), fit(5), fit(6), fit(7), fit(8), fit(9), fit(10), shell_segments{i}, fluorophores);
+		fit_image = fsa.image_ellipsoid_biased(fit(3), fit(4), fit(5), fit(6), fit(7), fit(8), fit(9), fit(10), shell_segments{i}, fluorophores, seed);
 		fit_segments{i} = fit_image;
 	end
 	fit_tiles = fsa.tile_segments(fit_segments);
@@ -133,7 +131,7 @@ for image_num = 1:length(input_files)
 	sr_segments = cell(length(shell_segments));
 	for i=1:length(sr_segments)
 		fit = fits{i+1};
-		sr_image = fsa.image_ellipsoid_biased(fit(3), fit(4), fit(5), fit(6), 1, fit(8), fit(9), fit(10), shell_segments{i},fluorophores);
+		sr_image = fsa.image_ellipsoid_biased(fit(3), fit(4), fit(5), fit(6), 1, fit(8), fit(9), fit(10), shell_segments{i}, fluorophores, seed);
 		sr_segments{i} = sr_image;
 	end
 	sr_tiles = fsa.tile_segments(sr_segments);
