@@ -1,4 +1,4 @@
-function elm_ellipsoidal_analysis(input_dir, output_dir, pixel_size, hough_low, hough_high, segmentation, border, seed, fluorophores, hough_sensitivity)
+function elm_ellipsoidal_analysis(input_dir, output_dir, hough_low, hough_high, segmentation, border, seed, fluorophores, hough_sensitivity)
 
 tic; % Start timing the analysis
 

@@ -1,4 +1,4 @@
-function elm_spherical_analysis(input_dir, output_dir, pixel_size, hough_low, hough_high, segmentation, border, seed, fluorophores, hough_sensitivity)
+function elm_spherical_analysis(input_dir, output_dir, hough_low, hough_high, segmentation, border, seed, fluorophores, hough_sensitivity)
 
 % Parameters for shell finding
 radius_lower = hough_low;

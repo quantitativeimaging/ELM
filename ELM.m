@@ -151,7 +151,6 @@ function process_btn_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 input_dir = get(handles.input_dir_edit, 'String');
 output_dir = get(handles.output_dir_edit, 'String');
-pixel_size = str2num(get(handles.pixel_size_edit, 'String'));
 model_type = get(get(handles.model_type_group, 'SelectedObject'), 'Tag');
 
 radius_low = str2num(getappdata(0, 'radius_low'));
@@ -169,7 +168,7 @@ switch model_type
 		model_type = 'ellipsoidal';
 end
 
-fsa.elm_analysis(input_dir, output_dir, pixel_size, model_type, radius_low, radius_high, segmentation, border, seed, fluorophores, hough_sensitivity)
+fsa.elm_analysis(input_dir, output_dir, model_type, radius_low, radius_high, segmentation, border, seed, fluorophores, hough_sensitivity)
 
 
 % --- Executes on button press in spherical_radiobtn.
@@ -188,29 +187,6 @@ function ellipsoidal_radiobtn_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of ellipsoidal_radiobtn
-
-
-
-function pixel_size_edit_Callback(hObject, eventdata, handles)
-% hObject    handle to pixel_size_edit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of pixel_size_edit as text
-%        str2double(get(hObject,'String')) returns contents of pixel_size_edit as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function pixel_size_edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to pixel_size_edit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
 
 
 % --- Executes when selected object is changed in model_type_group.
