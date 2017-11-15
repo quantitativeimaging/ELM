@@ -1,5 +1,6 @@
 % Script to post-process data from the 'output' folder of ELM software
-% Eric Rees, 2017 CC-BY
+% 
+% Eric Rees, 2017, Licence: CC-BY
 %
 % NOTES
 % 1. The ELM software produces a folder with pictures and a MAT file for each
@@ -14,7 +15,7 @@
 % 2. That software will produce a results folder
 % 3. Run this script and select the results folder using the dialog window
 % 4. Use the dialog box to specify quality control parameters for
-%    accepting / rejecting the results fiited to each image candidate, 
+%    accepting / rejecting the results fitted to each image candidate, 
 %    and also to specify the width (in nanometers, nm) of the pixels.
 % 
 % QUALITY CONTROL CRITERIA
@@ -105,18 +106,19 @@ for lp = 1:number_of_results
 		listFilenames(lp,1:6) = 'sample';
 	end
 
-qualityCheck = ones(size(fitData,1), 1);
-qualityCheck( (fitData(:,7)>threshold_blur) ) = 0; % Fails check if fit too blurred 
-qualityCheck( equiv_rads < min_radius ) = 0; % Fails check if fit is too small
-qualityCheck( equiv_rads > max_radius ) = 0; % Fails check if fit is too large
+  qualityCheck = ones(size(fitData,1), 1);
+  qualityCheck( (fitData(:,7)>threshold_blur) ) = 0; % Fails check if fit too blurred 
+  qualityCheck( equiv_rads < min_radius ) = 0; % Fails check if fit is too small
+  qualityCheck( equiv_rads > max_radius ) = 0; % Fails check if fit is too large
 
 
-  % figure(2)
+  % Record parameters to summarise the results from this image file
 	listCroppedEquivRads(lp)      = mean(equiv_rads(qualityCheck==1));
 	listCroppedEquivRadsStdev(lp) = std(equiv_rads(qualityCheck==1));
 	listNumberAccepted(lp) = sum(qualityCheck);
 	listNumberRejected(lp) = size(fitData,1) - listNumberAccepted(lp);
 	  
+	% Plot the fitted radius and blur of accepted + rejected candidates
 	figure(6)	
 	scatter(equiv_rads, fitData(:,7), 'r')
 	hold on
@@ -129,7 +131,7 @@ qualityCheck( equiv_rads > max_radius ) = 0; % Fails check if fit is too large
 	xlim([200 800])
 	ylim([4 16])
 	
-	% get residual as a % of 'signal energy'
+	% Calculate the residual as a percentage of the 'signal'
 	if(size(fitData,2)>=12) % If the 'sum of square signal' column exists
 		percentResidual = fitData(:,11)./fitData(:,12);
 		listCroppedPercentResidual(lp) = mean(percentResidual(qualityCheck==1));
