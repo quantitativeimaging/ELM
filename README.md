@@ -11,8 +11,7 @@ The principle of ellipsoid localisation microscopy is presented in the following
 This software package is a more developed and comprehensive version of the method used in the Manetsberger paper.
 The instructions and technical detail in this document accompany the paper:
 
-[James D. Manton, Yao Xiao, Robert D. Turner, Simon J. Foster, Graham Christie, Eric J. Rees. _ELM: super-resolution analysis of wide-field
-images of fluorescent shell structures_.]
+[James D. Manton, Robert D. Turner, Yao Xiao, Graham Christie, Eric J. Rees. _ELM: super-resolution analysis of wide-field images of fluorescent shell structures_.]
 
 Please cite these papers if you use this software for a publication.
 
