@@ -13,11 +13,14 @@ y = -(1:image_height) + image_centre_y;
 [x, y] = meshgrid(x, y);
 X = [x(:), y(:)];
 
+% rng(1066);
+% rnd_seeds = rand(fluorophores,2);
+
 f = @(initial_params, X) fsa.cross_section_ellipsoid_biased(initial_params(1), initial_params(2), initial_params(3), initial_params(4), initial_params(5), initial_params(6), initial_params(7), initial_params(8), X, fluorophores);
 initial_params = [x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, aspect_ratio_minus_one, equatoriality];
 opts = optimoptions('lsqcurvefit', 'Display', 'none', 'TolFun', 1e-10);
-upper_bounds = [5, 5, pi, 10, 10, max(actual_image(:)) * 2, 2, 0.75];
-lower_bounds = [-5, -5, -pi, 3, 3, max(actual_image(:)) * 0.1, -2, -1];
+upper_bounds = [5, 5, pi, 10, 10, max(actual_image(:)) * 2, 2.5, 0.75];
+lower_bounds = [-5, -5, -pi, 3, 3, max(actual_image(:)) * 0.1, 0, -1];
 fit_params = lsqcurvefit(f, initial_params, X, actual_image(:), lower_bounds, upper_bounds, opts);
 
 x_shift        = fit_params(1);
