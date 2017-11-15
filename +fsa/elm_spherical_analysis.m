@@ -35,26 +35,25 @@ for image_num = 1:length(input_files)
 	figure(2)
 	imshow(tiled_segments, [])
 	title(['Segmented shells for ', image_basename], 'interpreter', 'none')
-    try
-       shell_segment_mat = cell2mat(shell_segments);
-       Mxss = max(shell_segment_mat(:));
-       Mnss = min(shell_segment_mat(:));
-       caxis([Mnss, Mxss])
-			 tiled_segments = imsubtract(tiled_segments,double(Mnss) );
-    catch
-       warning('Problem reshaping segments to set caxis'); 
-    end
-    
-	% Save segmented shell tiles % Change mat2gray to uint16 to save full dat
+	try
+		shell_segment_mat = cell2mat(shell_segments);
+		Mxss = max(shell_segment_mat(:));
+		Mnss = min(shell_segment_mat(:));
+		caxis([Mnss, Mxss])
+		tiled_segments = imsubtract(tiled_segments,double(Mnss) );
+	catch
+		warning('Problem reshaping segments to set caxis');
+	end
+
+	% Save segmented shell tiles
 	imwrite(uint16(tiled_segments), fullfile(output_dir, [image_basename, '_raw.tif']));
 
 	% Fit all segmented shells. Display to the user one by one, if flag set
 	fits = cell(length(shell_segments) + 1, 1);
 	fitData = -ones(length(shell_segments), 12);
-    % Write headers in first row, and  copy as a string for file output
+	% Write headers in first row, and  copy as a string for file output
 	fits{1} = {'x segment pos,   y segment pos,   x shift,   y shift,   orientation,   semiminor axis,   PSF variance,   brightness,   aspectRatioMinusOne,   equatoriality,   residual, sum_square_signal'};
 	fitsHdr = ['x segment pos,   y segment pos,   x shift,   y shift,   orientation,   semiminor axis,   PSF variance,   brightness,   aspectRatioMinusOne,   equatoriality,   residual, sum_square_signal'];
-  %  fitsHdr = ['x segment pos,   y segment pos,   x shift,   y shift,   radius,   PSF sigma,   brightness,   residual'];
 	parfor i=1:length(shell_segments)
 		actual_image = shell_segments{i};
 		background = median(actual_image(actual_image < mean(actual_image(:))));
@@ -79,19 +78,14 @@ for image_num = 1:length(input_files)
 
 		x_pos = centres(i, 1);
 		y_pos = centres(i, 2);
-		fits{i+1} = [x_pos, y_pos, x_centre_fit, y_centre_fit, 0, ...
-			           radius_fit, psf_sigma_fit.^2, height_fit, 0, 0, ...
-								 residual, sum_square_signal];
-		fitData(i, :) = [x_pos, y_pos, x_centre_fit, y_centre_fit, 0, ...
-                        radius_fit, psf_sigma_fit.^2, height_fit, ...
-												0, 0, residual, sum_square_signal];
+		fits{i+1} = [x_pos, y_pos, x_centre_fit, y_centre_fit, 0, radius_fit, psf_sigma_fit.^2, height_fit, 0, 0, residual, sum_square_signal];
+		fitData(i, :) = [x_pos, y_pos, x_centre_fit, y_centre_fit, 0, radius_fit, psf_sigma_fit.^2, height_fit, 0, 0, residual, sum_square_signal];
 	end
 
 	% Fitted segments
 	fit_segments = cell(length(shell_segments));
 	for i=1:length(fit_segments)
 		fit = fits{i+1};
-		% image_sphere_thin((x_centre, y_centre, radius, psf_sigma, height, imagemat)
 		fit_image = fsa.image_sphere_thin(fit(3), fit(4), fit(6), sqrt(fit(7)), fit(8), shell_segments{i});
 		fit_segments{i} = fit_image;
 	end
@@ -107,40 +101,37 @@ for image_num = 1:length(input_files)
 	sr_segments = cell(length(shell_segments));
 	for i=1:length(sr_segments)
 		fit = fits{i+1};
-		% image_sphere_thin((x_centre, y_centre, radius, psf_sigma, height, imagemat)
 		sr_image = fsa.image_sphere_thin(fit(3), fit(4), fit(6), 1, fit(8), shell_segments{i});
 		sr_segments{i} = sr_image;
 	end
 	sr_tiles = fsa.tile_segments(sr_segments);
-    sr_recon = fsa.tile_reconstruction(sr_segments, size(image_data),centres, segment_half_size, 1); %
+	sr_recon = fsa.tile_reconstruction(sr_segments, size(image_data),centres, segment_half_size);
 
 	figure(4)
 	imshow(sr_tiles, [])
 	title(['SR shells for ', image_basename], 'interpreter', 'none')
 
-    % Display reconstruction as (non-scaled) image
-    figure(5)
-    imshow(sr_recon, [])
-    title(['Reconstructed image for', image_basename])
-    
+	% Display reconstruction as (non-scaled) image
+	figure(5)
+	imshow(sr_recon, [])
+	title(['Reconstructed image for', image_basename])
+
 	% Save fitted shell tiles
 	imwrite(mat2gray(sr_tiles), fullfile(output_dir, [image_basename, '_sr.tif']));
-    imwrite(mat2gray(sr_recon), fullfile(output_dir, [image_basename, '_recon.tif']));
+	imwrite(mat2gray(sr_recon), fullfile(output_dir, [image_basename, '_recon.tif']));
 
 	% Save fit parameters
 	save(fullfile(output_dir, [image_basename, '_params.mat']), 'fits', 'fitsHdr', 'fitData', 'shell_segments')
-    
-    fid = fopen(fullfile(output_dir, [image_basename, '_params.csv']),'wt');
-      fprintf(fid, [fitsHdr '\n']); % Write headers into what will be a csv
-    fclose(fid);
-    dlmwrite(fullfile(output_dir, [image_basename, '_params.csv']), cell2mat(fits(2:end)), '-append' )
 
-	% fits{1} = [];
-	% csvwrite(fullfile(output_dir, [image_basename, '_params.csv']), fits)
+	fid = fopen(fullfile(output_dir, [image_basename, '_params.csv']),'wt');
+	fprintf(fid, [fitsHdr '\n']); % Write headers into what will be a csv
+	fclose(fid);
+	dlmwrite(fullfile(output_dir, [image_basename, '_params.csv']), cell2mat(fits(2:end)), '-append' )
 
 	% Update waitbar
 	waitbar(image_num / length(input_files));
 end
+
 close(progress)
 
 end

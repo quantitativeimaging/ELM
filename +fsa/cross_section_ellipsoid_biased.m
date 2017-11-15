@@ -1,7 +1,7 @@
 function I = cross_section_ellipsoid_biased(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, X, fluorophores)
 % CROSS_SECTION_ELLIPSOID_BIASED Return radial intensities of image of a thin biased ellipsoidal shell
 %
-%   I = CROSS_SECTION_ELLIPSOID_BIASED(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, X, fluorophores, vargin)
+%   I = CROSS_SECTION_ELLIPSOID_BIASED(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, eccentricity, equatoriality, X, fluorophores)
 %
 %   Input:
 %     x_shift        - x coordinate of shell centre
@@ -14,30 +14,16 @@ function I = cross_section_ellipsoid_biased(x_shift, y_shift, orientation, semim
 %     equatoriality  - degree of bias towards the equator
 %     X              - array of (x, y) coordinates
 %     fluorophores   - number of fluorophores to simulate
-%     varargin       - rnd_seeds = random number seeds for this simulation
 %
 %   Output:
 %     I - vector of radial image intensities
 %
 %   See also CROSS_SECTION_SPHERE_THIN.
 
-% Set a fixed random number generator seed.
-%   This seems to be essential for the lsqcurvefit (simplex algorithm?)
-%   to correctly optimise the simulated ellipsoid model.
+rng(1066);
 
-rng(1066); 
-% Note: if we are now using fixed fluorophore positions on model, 
-%  we can probably reprogram to avoid unnecessary recalculation
 num_points = uint16(fluorophores);
 aspect_ratio = eccentricity + 1;
-% if(nargin==11) % Surprisingly, this provides negligible speed-up
-% 	rnd_seeds = varargin{1};
-%   phi = 2 * pi  * rnd_seeds(:, 1);
-%   cos_theta = 2 * rnd_seeds(:, 2) - 1;
-% else
-%   phi = 2 * pi * rand(num_points, 1);
-%   cos_theta = 2 * rand(num_points, 1) - 1;
-% end
 phi = 2 * pi * rand(num_points, 1);
 cos_theta = 2 * rand(num_points, 1) - 1;
 
@@ -47,19 +33,7 @@ x_axis = semimajor_axis .* sin_theta .* cos(phi);
 y_axis = semiminor_axis .* sin_theta .* sin(phi);
 z_axis = semiminor_axis .* cos_theta;
 
-% % Try using rejection sampling for polarised ellipsoid:
-% % Discard some points randomly to produce uniform sampling on surface
-% acceptance_ratio = sqrt((y_axis ./ semiminor_axis).^2 + (z_axis ./ semiminor_axis).^2 + (x_axis .* semiminor_axis).^2 ./ (semimajor_axis^4));
-% sinT = sqrt((y_axis.^2 + z_axis.^2) ./ sqrt(x_axis.^2 + y_axis.^2 + z_axis.^2));
-% acceptance_ratio = acceptance_ratio .* (1 + equatoriality .* sinT);
-% acceptance_probability = acceptance_ratio ./ max(acceptance_ratio(:));
-% random_probability = rand(length(acceptance_probability), 1);
-% x_axis = x_axis(random_probability < acceptance_probability);
-% y_axis = y_axis(random_probability < acceptance_probability);
-% z_axis = z_axis(random_probability < acceptance_probability);
-
-% Use attenuation sampling to produce uniformly dense surface brightness
-% then polarise it (make poles relatively brighter) with a sinT term
+% Use attenuation sampling to produce uniformly dense surface brightness then polarise it (make poles relatively brighter) with a sinT term
 brightness_ratio = sqrt((y_axis ./ semiminor_axis).^2 + (z_axis ./ semiminor_axis).^2 + (x_axis .* semiminor_axis).^2 ./ (semimajor_axis^4));
 sinT = sqrt((y_axis.^2 + z_axis.^2) ./ sqrt(x_axis.^2 + y_axis.^2 + z_axis.^2));
 brightness_ratio = brightness_ratio .* (1 + equatoriality .* sinT);
