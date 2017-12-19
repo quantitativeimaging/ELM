@@ -19,10 +19,10 @@ a         = cylrad;
 nPoints   = 10000;  % Number of fluorophores to simulate
 
 % FORWARD MODEL FOR PIXEL VALUES
-% Relevant Distances from pixels (centre of each pixel) 
+% Relevant Distances from pixels (centre of each pixel)
 % rr   =  distance from cylinder centre
 % chi  =  angle with cylinder axis
-% rCyl =  distance from cylinder axis along XY plane 
+% rCyl =  distance from cylinder axis along XY plane
 
 
 
@@ -42,8 +42,8 @@ for lp = 1:nPoints
     end
     dispsSq = ( (surfX(lp) - X(:,1) ).^2 + ...
                 (surfY(lp) - X(:,2) ).^2 + ....
-                (1/11)*(surfZ(lp)).^2 ); % z-PSF, Zhang 2007, NA 1.4 WFFM n 1.33 
-              
+                (1/11)*(surfZ(lp)).^2 ); % z-PSF, Zhang 2007, NA 1.4 WFFM n 1.33
+
     ints  = exp(-(dispsSq)./twoSS);
     I = I + ints;
 end

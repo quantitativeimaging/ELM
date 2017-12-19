@@ -1,9 +1,7 @@
 % Image analysis of cylindrical bacteria walls
 %   Start with fluorescence microscopy image data
-%   Fit model parameters for thin fluorescent cylindrical shells 
-%   
-% Eric Rees July 2015. 
-% Bob Turner
+%   Fit model parameters for thin fluorescent cylindrical shells
+%
 %   1st step: Image segmentation (manual quadrilateral selection)
 %             Make some very arbitrary choices about approximate size
 %   2nd step: Fit model of thin shell to image data
@@ -15,19 +13,19 @@
 % Please reference:   (see github reference)
 %
 %
-% Notes 
-%   
+% Notes
+%
 
 % Good data for illustrations:
 % fileIn = ['C:\Users\user\Documents\Projects\2014_Spores\testSTORM\sum\' ,...
-%      '9_spores_test_image 2_Recon 1_sum_sc.tif']; % 
+%      '9_spores_test_image 2_Recon 1_sum_sc.tif']; %
 
 
-% 0. SETUP 
+% 0. SETUP
 % fileIn = ['C:\Users\user\Documents\Projects\2014_Spores\2015_BobTurner\' ,...
-%      'B_subtilis168_HADA.tif']; % 
+%      'B_subtilis168_HADA.tif']; %
 fileIn = 'B_subtilis168_HADA.tif';
-	 
+
 flagShowModelImages = 1;
 
 flagGetCalled = 1;  % = 1 means this script is called externally
@@ -36,7 +34,7 @@ flagGetCalled = 1;  % = 1 means this script is called externally
 
 
 % 1. INPUT
-%    Read a frame of fluorescence microscopy data 
+%    Read a frame of fluorescence microscopy data
 %
 if(flagGetCalled)
     % Allow another script to call this one and overwrite file input etc.
@@ -49,7 +47,7 @@ imDatCp  = mean(imDat,3); % Make a grey copy for analysis
 figure(1)
   imagesc(imDatCp);
   colormap(gray);
-  
+
 
 % 2. ANALYSIS
 %    Segment the frame of image data
@@ -64,26 +62,26 @@ figure(1)
 if(flagGetCalled)
    % Look up the region of interest
    myMask = suppliedMask;
-   
+
    [XX,YY] = meshgrid(1:size(imDatCp,2), 1:size(imDatCp,1) );
    listX = XX(myMask);
    listY = YY(myMask);
-   
+
    % Just for figure plotting purposes:
    myBox = [min(listX), min(listY), max(listX)-min(listX), max(listY)-min(listY)];
    myROI      = imcrop(imDatCp, myBox );
    background = median(myROI(myROI<mean(myROI(:))));
-   maskBact   = (myROI>mean(myROI(:))); 
+   maskBact   = (myROI>mean(myROI(:)));
    mySig      = myROI - background;
-   
+
    listX = listX + 1 - min(listX(:));
    listY = listY + 1 - min(listY(:));
-   
+
    listI = imDatCp(myMask);
    % background = median(myROI(myROI<mean(myROI(:))));
    background = min(myROI(:));
    listI = listI - background;
-   
+
    hold on
    for lp = 1:numberRegions
      c = int2str(lp);
@@ -96,31 +94,31 @@ else
    % Manually select a rectangular region of interest
    myBox = getrect(1);
    myBox = floor(myBox);
-   
+
    [XX,YY] = meshgrid(1:(myBox(3)+1), 1:(myBox(4)+1));
    listX = XX(:);
    listY = YY(:);
-   
+
    myROI = imcrop(imDatCp, myBox );
    % Estimate bacteria position by estimating bright fluorescence position:
    background = median(myROI(myROI<mean(myROI(:))));
-   maskBact   = (myROI>mean(myROI(:))); 
+   maskBact   = (myROI>mean(myROI(:)));
 
    mySig      = myROI - background;
    listI      = mySig(:); % Should be catenated columns
 end
-  
+
 
 X       = [listX, listY];
 maxdiag = sqrt(max(listX)-min(listX)^2 + (max(listY)-min(listY))^2);
 
 % % myROI is image data in region of interest
 % myROI = imcrop(imDatCp, myBox );
-% 
+%
 % % Estimate bacteria position by estimating bright fluorescence position:
 % background = median(myROI(myROI<mean(myROI(:))));
-% maskBact   = (myROI>mean(myROI(:))); 
-% 
+% maskBact   = (myROI>mean(myROI(:)));
+%
 % mySig      = myROI - background;
 % listI      = mySig(:); % Should be catenated columns
 
@@ -170,8 +168,8 @@ mdlPsi  =  beta(6);
 
 % 3. OUTPUT
 
-%    Show observed and fitted pixel values in cross section. 
-% 
+%    Show observed and fitted pixel values in cross section.
+%
 
 
 if(flagShowModelImages)

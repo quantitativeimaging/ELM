@@ -1,14 +1,13 @@
 % batch_cylWall
 %  A script to process several user-selected regions of cylindrical shells
 %
-% Eric Rees 2015
 % Cylindrical fluorescent shell analysis
 % Author: Eric Rees, 2017
 % License: CC-BY 4.0
 
 % INSTRUCTIONS:
-% 
-%  Ensure the scripts (wall_analysis_v1, image_cylWall_Monte 
+%
+%  Ensure the scripts (wall_analysis_v1, image_cylWall_Monte
 %  and fitCylWallMonte) are on the Matlab path (e.g. in the same folder as
 %  this script, and use this script as the working folder).
 %
@@ -24,8 +23,8 @@
 %     its width, otherwise the auto-initial guess of orientation may be bad
 % 6. Wait for the inverse modelling to process (may take 30 s per segment)
 % 7. Multiply listRads by pixel width to get physical cylinder radius
-% 8. A quality control step may be needed to reject misfitted regions. 
-%     
+% 8. A quality control step may be needed to reject misfitted regions.
+%
 
 
 % 1. INPUT
@@ -46,7 +45,7 @@ answer = inputdlg('How many regions of interest?','user region of interest selec
 numberRegions = str2num(answer{1});
 
 % 2. ESTABLISH WHICH REGIONS TO PROCESS
-% Allocate arrays to store selected regions, and their fitted parameters 
+% Allocate arrays to store selected regions, and their fitted parameters
 listMasks = false([size(imDatCp),numberRegions]); %
 listXi    = zeros(5, numberRegions);
 listYi    = zeros(5, numberRegions);
@@ -59,7 +58,7 @@ listPsi   = zeros(numberRegions, 1);
 listDiags = zeros(numberRegions, 1); % Long diagonal length of box
 listInd   = zeros(numberRegions, 1); % Index (in case of later deletions)
 
-dx = 4; 
+dx = 4;
 dy = 1; % Displacement so the text labels do not overlay the data points
 
 % Obtain the required number of regions from user input
@@ -67,7 +66,7 @@ for lpUser = 1:numberRegions
     [aMask, xi, yi] = roipoly;
     listMasks(:,:,lpUser) = aMask;
     if(length(xi)>=5) % If a quadrilateral or higher is chosen
-      listXi(:,lpUser)     = xi(1:5); % record 4 vertices. 
+      listXi(:,lpUser)     = xi(1:5); % record 4 vertices.
       listYi(:,lpUser)     = yi(1:5);
     end
     figure(1)
@@ -75,19 +74,19 @@ for lpUser = 1:numberRegions
      c = int2str(lpUser);
      text(max(xi)+dx, max(yi)+dy, c, 'color', 'g','fontSize',14);
      plot(xi, yi, 'g')
-    hold off  
+    hold off
 end
 
 % 3. CALL WALL ANALYSIS AND SAVE FITTED PARAMETERS
 for lpBatch = 1:numberRegions
- 
-    % suppliedMask = listMasks(:,:,lpBatch); 
+
+    % suppliedMask = listMasks(:,:,lpBatch);
     xi = listXi(:,lpBatch);
     yi = listYi(:,lpBatch);
     suppliedMask = poly2mask(xi, yi, size(imDatCp,1), size(imDatCp,2));
-    
+
     wall_analysis_v1; % Fit cylinder parameters to this segment
-    
+
 		% Store fitted parameters
     listRad(lpBatch)  = mdlRad;
     listXCen(lpBatch) = mdlXCen + min(listXi(:,lpBatch));
@@ -97,7 +96,7 @@ for lpBatch = 1:numberRegions
     listPsi(lpBatch)  = mdlPsi;
     listDiags(lpBatch)= maxdiag;
     listInd(lpBatch)  = lpBatch;
-  
+
 end
 
 % 4. GENERATE A RECONSTRUCTED IMAGE

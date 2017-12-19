@@ -1,7 +1,7 @@
 function beta = fitCylWallParams(X, listI, b0)
 
 maxVar        = 16; % Prevent PSF width getting stuck at high values.
-flagFixedBlur = 0;  % Or set to 1 to disallow PSF width from varying. 
+flagFixedBlur = 0;  % Or set to 1 to disallow PSF width from varying.
 flagGraph     = 2;  % Which fit graph to plot.
 
 radX   = 0.5;       % X-centre parameter adjustments to consider
@@ -9,12 +9,8 @@ radY   = 0.5;
 radR   = 0.2*b0(3); % S.L.R. of ellipse
 radVar = 0.15*b0(4);
 radHt  = 0.1*b0(5);
-% radEl  = 0.1;       % ellipticity, meaning shape factor - 1, (c/a - 1)
 radPsi = 0.20;      % azimuthal orientation, radians
 
-% b0(5) = max(listI); % 
-% b0(6) = 0.20        % Force initial ellipticity to promote angle finding
-% b0(7) = 0.850;
 
 numberIts = 30;
 shift     = 0.95;     % The range 0.9 to 0.95 seems reasonable
@@ -37,8 +33,8 @@ for lpIts = 1:numberIts
         b0(3) = b0(3) - radR/2;
     end
     radR = shift*radR;
-    
-    % Check for blur radius (point spread function) improvement 
+
+    % Check for blur radius (point spread function) improvement
     if(flagFixedBlur ==0) % Skip this is a fixed blur width is being used.
     I     = image_cylWall_Monte(b0, X);
     sumSq = sum((I - listI).^2);
@@ -54,8 +50,8 @@ for lpIts = 1:numberIts
     radVar = shift*radVar;
     b0(4) = min([b0(4), maxVar]);
     end
-    
-    % Check for brightness (signal height) improvement 
+
+    % Check for brightness (signal height) improvement
     I     = image_cylWall_Monte(b0, X);
     sumSq = sum((I - listI).^2);
     IhtHi = image_cylWall_Monte(b0 + [0,0,0,0,radHt,0], X);
@@ -68,7 +64,7 @@ for lpIts = 1:numberIts
          b0(5) = b0(5) - radHt/2;
     end
     radHt = radHt*shift;
-    
+
     % Check for centre co-ordinate improvement (X-direction)
     I     = image_cylWall_Monte(b0, X);
     sumSq = sum((I - listI).^2);
@@ -96,7 +92,7 @@ for lpIts = 1:numberIts
          b0(2) = b0(2) - radX/2;
     end
     radY = radY*shiftCoarse;
-    
+
     % Check for azimuthal angle improvement
     I     = image_cylWall_Monte(b0, X);
     sumSq = sum((I - listI).^2);
@@ -110,10 +106,10 @@ for lpIts = 1:numberIts
          b0(6) = b0(6) - radPsi/2;
     end
     radPsi = radPsi*shift;
-    
-    
+
+
     listParams(lpIts,:) = b0;
-    
+
     if(flagGraph == 1)
      figure(7)
      rr = sqrt((X(:,1)-b0(1)).^2 + (X(:,2)-b0(2)).^2);
@@ -130,11 +126,11 @@ for lpIts = 1:numberIts
      rVecY = (X(:,2)-b0(2));
      angle = atan(rVecY./rVecX);
      t = angle + b0(6);
-     
+
      t(t>(pi/2)) = t(t>(pi/2)) - pi;
      t(t<(-pi/2)) = t(t<(-pi/2)) + pi;
      ySec = rr.*sin(t);
-     
+
      scatter(ySec, listI, 'bo');
      hold on
        plot(ySec,I,'gx')
@@ -142,7 +138,7 @@ for lpIts = 1:numberIts
      xlabel('cross section')
      ylabel('pixel value')
      drawnow;
-     
+
      figure(8)
      scatter(angle, t)
     end
@@ -150,7 +146,7 @@ end
 
 % Further iterature to refine radius.
 for lpIts = (numberIts+1): (2*numberIts)
-    
+
     I     = image_cylWall_Monte(b0, X);
     sumSq = sum((I - listI).^2);       % Quantifies misfit at initial guess
 
@@ -165,9 +161,9 @@ for lpIts = (numberIts+1): (2*numberIts)
         b0(3) = b0(3) - radR/2;
     end
     radR = shift*radR;
-    
-    
-    % Check for brightness (signal height) improvement 
+
+
+    % Check for brightness (signal height) improvement
     I     = image_cylWall_Monte(b0, X);
     sumSq = sum((I - listI).^2);
     IhtHi = image_cylWall_Monte(b0 + [0,0,0,0,radHt,0], X);
@@ -180,8 +176,8 @@ for lpIts = (numberIts+1): (2*numberIts)
          b0(5) = b0(5) - radHt/2;
     end
     radHt = radHt*shift;
-    
-		% Check for blur radius (point spread function) improvement 
+
+		% Check for blur radius (point spread function) improvement
     if(flagFixedBlur ==0) % Skip this is a fixed blur width is being used.
     I     = image_cylWall_Monte(b0, X);
     sumSq = sum((I - listI).^2);
@@ -197,9 +193,9 @@ for lpIts = (numberIts+1): (2*numberIts)
     radVar = shift*radVar;
     b0(4) = min([b0(4), maxVar]);
     end
-		
+
     listParams(lpIts,:) = b0;
-    
+
     if(flagGraph == 1)
      figure(7)
      rr = sqrt((X(:,1)-b0(1)).^2 + (X(:,2)-b0(2)).^2);
@@ -216,11 +212,11 @@ for lpIts = (numberIts+1): (2*numberIts)
      rVecY = (X(:,2)-b0(2));
      angle = atan(rVecY./rVecX);
      t = angle + b0(6);
-     
+
      t(t>(pi/2)) = t(t>(pi/2)) - pi;
      t(t<(-pi/2)) = t(t<(-pi/2)) + pi;
      ySec = rr.*sin(t);
-     
+
      scatter(ySec, listI, 'bo');
      hold on
        plot(ySec,I,'rx')
