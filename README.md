@@ -144,7 +144,7 @@ Columns 1 and 2.
 ```x segment pos``` and	   ```y segment pos``` are the rough XY-coordinates of the spore centre, estimated by the segmentation step of the image analysis. Units are pixel widths.
 
 Columns 3 and 4.
-```x shift``` and ```y shift``` are the XY-offsets to the exact centre position of the spore, obtained by the fitting step of the image analysis. Units are pixel widths.
+```x shift``` and ```y shift``` are the XY-offsets to the exact centre position of the spore, obtained by the fitting step of the image analysis. Units are pixel widths. Note that the final estimate of the centre position is given by ```floor(x segment pos) + x shift``` because the rough XY-coordinates are rounded down to the nearest integer in order to obtain an integer pixel value as a starting point for the precise fitting process. 
 
 Column 5.
 ```orientation``` is the azimuth orientation inferred by the ellipsoidal model for a prolate ellipsoid of revolution with its long axis lying in the XY plane.
