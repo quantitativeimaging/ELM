@@ -60,16 +60,18 @@ myFolder = uigetdir('../example_output','Select folder for analysis');
 prompt = {'Pixel width in nm (e.g. 74)', ...
 	        'Blur radius limit (as variance, e.g. 10)', ...
 	        'Minimum radius in nm', ...
-					'Maximum radius in nm'};
+					'Maximum radius in nm',...
+					'Pause after each frame ( 1 =yes)'};
 dlg_title = 'Analysis settings';
 num_lines = 1;
-defaultans = {'74','10','300', '700'};
+defaultans = {'74','10','300', '700','0'};
 answer = inputdlg(prompt,dlg_title,num_lines,defaultans);
 
 pixel_width_nm = str2num(answer{1});
 threshold_blur = str2num(answer{2});
 min_radius     = str2num(answer{3});
 max_radius     = str2num(answer{4});
+pause_framewise= str2num(answer{5});
 
 
 listMats = dir([myFolder, '\*.mat']); % in the chosen directory
@@ -141,7 +143,9 @@ for lp = 1:number_of_results
 	output_list_accepted_radii_nm = [output_list_accepted_radii_nm; accepted_radii];
 	
 	tile_assessed_segments(shell_segments, qualityCheck); % Show accepted fits
-	% pause
+	if(pause_framewise)
+		pause
+	end
 end
 
 % OUTPUT
