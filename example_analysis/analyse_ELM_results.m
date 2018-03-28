@@ -58,13 +58,14 @@ myFolder = uigetdir('../example_output','Select folder for analysis');
 
 % 1.1 Get pixel width and quality control criteria
 prompt = {'Pixel width in nm (e.g. 74)', ...
-	        'Blur radius limit (as variance, e.g. 10)', ...
-	        'Minimum radius in nm', ...
-					'Maximum radius in nm',...
-					'Pause after each frame ( 1 =yes)'};
+	        'Blur radius limit (as variance, e.g. 10 or 9.9)', ...
+	        'Minimum radius in nm (e.g. 300)', ...
+					'Maximum radius in nm (e.g. 700)',...
+					'Pause after each frame ( 1 =yes)',...
+					'Write output to csv spreadsheet (1 = yes)'};
 dlg_title = 'Analysis settings';
 num_lines = 1;
-defaultans = {'74','10','300', '700','0'};
+defaultans = {'74','9.9','300', '700','0','1'};
 answer = inputdlg(prompt,dlg_title,num_lines,defaultans);
 
 pixel_width_nm = str2num(answer{1});
@@ -72,6 +73,7 @@ threshold_blur = str2num(answer{2});
 min_radius     = str2num(answer{3});
 max_radius     = str2num(answer{4});
 pause_framewise= str2num(answer{5});
+flag_write_csvs= str2num(answer{6});
 
 
 listMats = dir([myFolder, '\*.mat']); % in the chosen directory
@@ -159,6 +161,7 @@ ylabel('equivalent radius / nm')
 xlabel('Protein')
 set(gca, 'fontSize', 14);
 
+if(flag_write_csvs)
 % Write all the accepted radii into a CSV file in a long list
 % csvwrite(fullfile(myFolder, ['Z_all_accepted_radii.csv']), output_list_accepted_radii_nm);
 fid =fopen(fullfile(myFolder, ['Z_all_accepted_radii.csv']),'wt');
@@ -186,3 +189,5 @@ fid =fopen(fullfile(myFolder, ['Z_summary.csv']),'wt');
     fprintf(fid,formatSpec,output_cell_array{row,:});
   end
 fclose(fid);
+
+end
