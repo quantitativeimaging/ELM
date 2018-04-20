@@ -62,10 +62,11 @@ prompt = {'Pixel width in nm (e.g. 74)', ...
 	        'Minimum radius in nm (e.g. 300)', ...
 					'Maximum radius in nm (e.g. 700)',...
 					'Pause after each frame ( 1 =yes)',...
-					'Write output to csv spreadsheet (1 = yes)'};
+					'Write output to csv spreadsheet (1 = yes)',...
+				  'Save quality control figures (1=yes)' };
 dlg_title = 'Analysis settings';
 num_lines = 1;
-defaultans = {'74','9.9','300', '700','0','1'};
+defaultans = {'74','9.9','300', '700','0','1','1'};
 answer = inputdlg(prompt,dlg_title,num_lines,defaultans);
 
 pixel_width_nm = str2num(answer{1});
@@ -74,6 +75,7 @@ min_radius     = str2num(answer{3});
 max_radius     = str2num(answer{4});
 pause_framewise= str2num(answer{5});
 flag_write_csvs= str2num(answer{6});
+flag_save_quals= str2num(answer{7});
 
 
 listMats = dir([myFolder, '\*.mat']); % in the chosen directory
@@ -144,10 +146,23 @@ for lp = 1:number_of_results
 	accepted_radii = equiv_rads(qualityCheck==1);
 	output_list_accepted_radii_nm = [output_list_accepted_radii_nm; accepted_radii];
 	
-	tile_assessed_segments(shell_segments, qualityCheck); % Show accepted fits
+	% Show assessed fits. This is hard-coded to produce figure '7'
+	tile_assessed_segments(shell_segments, qualityCheck); 
 	if(pause_framewise)
 		pause
 	end
+	if(flag_save_quals) 
+		% Save picture of visual quality check for later visual assessment
+		figure(7)
+		axis tight
+		myIm = getframe(7);
+		myFig = myIm.cdata;
+		myFullFilenameFig = [myFolder,'\', listMats(lp).name];
+		myFullFilenameFig(end-2:end) = [];
+		myFullFilenameFig = [myFullFilenameFig,'_quality_check.png']
+		imwrite(myFig, myFullFilenameFig)
+	end
+	
 end
 
 % OUTPUT

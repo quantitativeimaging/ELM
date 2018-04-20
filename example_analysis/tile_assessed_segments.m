@@ -21,9 +21,14 @@ for i=1:num_segments
 	tiled_assessed_segments(rows, cols) = shell_segments{i};
 end
 
+shell_segments_array = cell2mat(shell_segments);
+min_value = min(shell_segments_array(:));
+max_value = max(shell_segments_array(:));
+
 figure(7)
 imagesc(tiled_assessed_segments)
 colormap(gray)
+caxis([min_value, max_value])
 hold on
 for i=1:num_segments
 	positRow = (1 + (mod(i - 1, num_rows) + 0.5)*segment_size);
