@@ -1,6 +1,7 @@
 function shell_images = segment_shells(image_data, centres, segment_half_size)
 
 shell_images = cell(size(centres, 1), 1);
+% Note: 'centres' is (x,y) from 'find_circular_shells' so is (column, row)
 
 for i=1:size(centres, 1)
 	row_centre = floor(centres(i, 2));

@@ -1,5 +1,6 @@
 function [x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, aspect_ratio_minus_one, equatoriality, residual] = fit_ellipsoid(x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, aspect_ratio_minus_one, equatoriality, actual_image, fluorophores, seed)
-
+% Note: need to change bounds on PSF variance for different microscope. 
+%  2019-jan: changed from 3 to 1.
 image_width = size(actual_image, 2);
 image_height = size(actual_image, 1);
 
@@ -17,7 +18,7 @@ f = @(initial_params, X) fsa.cross_section_ellipsoid_biased(initial_params(1), i
 initial_params = [x_shift, y_shift, orientation, semiminor_axis, psf_variance, height, aspect_ratio_minus_one, equatoriality];
 opts = optimoptions('lsqcurvefit', 'Display', 'none', 'TolFun', 1e-10);
 upper_bounds = [5, 5, pi, 10, 10, max(actual_image(:)) * 2, 2.5, 0.75];
-lower_bounds = [-5, -5, -pi, 3, 3, max(actual_image(:)) * 0.1, 0, -1];
+lower_bounds = [-5, -5, -pi, 3, 1, max(actual_image(:)) * 0.1, 0, -1];
 fit_params = lsqcurvefit(f, initial_params, X, actual_image(:), lower_bounds, upper_bounds, opts);
 
 x_shift = fit_params(1);
